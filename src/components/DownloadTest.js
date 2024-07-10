@@ -14,7 +14,7 @@ const DownloadTest = () => {
     setProgress(0);
 
     try {
-      await axios.get('https://aryoprakarsa.github.io/speedtest/test-file/10MB.bin', {
+      await axios.get('https://www.speedtest.aryo.ai/test-file/10MB.bin', {
         responseType: 'arraybuffer',
         onDownloadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / fileSizeInBytes);
