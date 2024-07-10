@@ -24,6 +24,28 @@
     align-items: center;
     margin: 0 auto;
     animation: pulse 2s infinite;
+    border: 2px solid #007bff;
+    background-color: transparent;
+    color: #007bff;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.circle-button:hover {
+    background-color: transparent !important;
+    color: #007bff !important;
+    outline: none;
+    box-shadow: none;
+    border: 2px solid #007bff;
+}
+
+.circle-button:focus,
+.circle-button:active,
+.circle-button:focus-visible {
+    background-color: transparent !important;
+    color: #007bff !important;
+    outline: none;
+    box-shadow: none;
+    border: 2px solid #007bff;
 }
 
 @keyframes pulse {
