@@ -7,7 +7,7 @@ const SpeedTest = () => {
   return (
     <div>
       <Helmet>
-        <title>Speed Test App</title>
+        <title>Speed Test Application</title>
         <meta name="description" content="Test your download and upload speeds with our Speed Test Application." />
       </Helmet>
       <h1>Speed Test</h1>
