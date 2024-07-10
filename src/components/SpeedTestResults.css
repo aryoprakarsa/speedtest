@@ -1,21 +1,99 @@
 .bold-text {
     font-weight: bold;
-    font-size: 18px;
-}
-
-button {
-    margin-bottom: 20px;
-    /* Add space below the buttons */
+    font-size: 20px;
 }
 
 .progress-bar-container {
     margin-bottom: 20px;
-    /* Add space below the progress bar */
-    height: 25px;
-    /* Adjust the height of the progress bar */
+    height: 30px;
 }
 
 .custom-progress-bar .progress-bar {
-    font-size: 15px;
-    /* Change the font size to 14px */
+    font-size: 14px;
+}
+
+.circle-button {
+    border-radius: 50%;
+    padding: 20px 40px;
+    font-size: 16px;
+    text-align: center;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 576px) {
+    .bold-text {
+        font-size: 16px;
+    }
+
+    .progress-bar-container {
+        height: 25px;
+    }
+
+    .custom-progress-bar .progress-bar {
+        font-size: 12px;
+    }
+
+    .circle-button {
+        padding: 15px 30px;
+        font-size: 14px;
+        width: 120px;
+        height: 120px;
+    }
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    padding-bottom: 2rem;
+}
+
+.footer {
+    padding: 1rem 0;
+    background: #f8f9fa;
+}
+
+.custom-card-footer {
+    text-align: left;
+}
+
+.custom-list {
+    margin-left: 20px;
+    padding-left: 0;
+}
+
+.custom-list li {
+    margin-bottom: 5px;
+    padding-left: 0;
+    text-align: left;
 }
