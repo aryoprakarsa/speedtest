@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 
 const UploadTest = () => {
   const [uploadSpeed, setUploadSpeed] = useState(null);
@@ -9,11 +8,11 @@ const UploadTest = () => {
     const fileSizeInBytes = 10000000; // 10MB file size
     const testFile = new Blob([new Uint8Array(fileSizeInBytes)], { type: 'application/octet-stream' });
 
-    const formData = new FormData();
-    formData.append('file', testFile, 'testfile.dat');
-
     try {
-      await axios.post('https://cors-anywhere.herokuapp.com/YOUR_UPLOAD_ENDPOINT_URL', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      // Simulate file processing/upload
+      // Here you can simulate a delay to mimic network conditions
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate a 1 second delay
+
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;

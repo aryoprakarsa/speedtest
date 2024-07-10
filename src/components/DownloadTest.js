@@ -9,7 +9,7 @@ const DownloadTest = () => {
     const fileSizeInBytes = 10000000; // 10MB file size
 
     try {
-      await axios.get('https://thingproxy.freeboard.io/fetch/https://drive.google.com/uc?export=download&id=1pGHOQ0lSlTPu51zwjeHmjw0G_CQmLnPc', { responseType: 'arraybuffer' });
+      await axios.get('https://aryoprakarsa.github.io/speedtest/test-file/10MB.bin', { responseType: 'arraybuffer' });
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
