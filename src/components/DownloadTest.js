@@ -1,6 +1,20 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ProgressBar } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported
+import './SpeedTestResults.css';
+
+// Add formatSpeed function here
+const formatSpeed = (speedInBps) => {
+  const speedInKbps = speedInBps / 1000;
+  const speedInMbps = speedInKbps / 1000;
+
+  if (speedInKbps < 1000) {
+    return `${speedInKbps.toFixed(2)} Kbps`;
+  } else {
+    return `${speedInMbps.toFixed(2)} Mbps`;
+  }
+};
 
 const DownloadTest = () => {
   const [downloadSpeed, setDownloadSpeed] = useState(null);
@@ -24,8 +38,7 @@ const DownloadTest = () => {
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const speedInMbps = speedInBps / 1000000;
-      setDownloadSpeed(speedInMbps.toFixed(2));
+      setDownloadSpeed(formatSpeed(speedInBps));
     } catch (error) {
       console.error('Error downloading the file:', error);
     } finally {
@@ -35,13 +48,19 @@ const DownloadTest = () => {
 
   return (
     <div>
-      <button onClick={testDownloadSpeed} disabled={isDownloading}>Test Download Speed</button>
+      <button 
+        className="btn btn-primary mb-3" 
+        onClick={testDownloadSpeed} 
+        disabled={isDownloading}
+      >
+        Test Download Speed
+      </button>
       {isDownloading && (
-        <div>
-          <ProgressBar now={progress} label={`${progress}%`} />
+        <div className="progress-bar-container custom-progress-bar">
+          <ProgressBar now={progress} label={`${progress}%`} style={{ height: '30px' }} />
         </div>
       )}
-      {downloadSpeed && <p>Download Speed: {downloadSpeed} Mbps</p>}
+      {downloadSpeed && <p className="bold-text">Download Speed: {downloadSpeed}</p>}
     </div>
   );
 };

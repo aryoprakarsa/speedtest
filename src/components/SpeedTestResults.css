@@ -1,0 +1,21 @@
+.bold-text {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+button {
+    margin-bottom: 20px;
+    /* Add space below the buttons */
+}
+
+.progress-bar-container {
+    margin-bottom: 20px;
+    /* Add space below the progress bar */
+    height: 25px;
+    /* Adjust the height of the progress bar */
+}
+
+.custom-progress-bar .progress-bar {
+    font-size: 15px;
+    /* Change the font size to 14px */
+}

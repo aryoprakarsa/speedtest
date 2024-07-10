@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
 import { ProgressBar } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported
+import './SpeedTestResults.css';
+
+// Add formatSpeed function here
+const formatSpeed = (speedInBps) => {
+  const speedInKbps = speedInBps / 1000;
+  const speedInMbps = speedInKbps / 1000;
+
+  if (speedInKbps < 1000) {
+    return `${speedInKbps.toFixed(2)} Kbps`;
+  } else {
+    return `${speedInMbps.toFixed(2)} Mbps`;
+  }
+};
 
 const UploadTest = () => {
   const [uploadSpeed, setUploadSpeed] = useState(null);
@@ -23,8 +37,7 @@ const UploadTest = () => {
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const speedInMbps = speedInBps / 1000000;
-      setUploadSpeed(speedInMbps.toFixed(2));
+      setUploadSpeed(formatSpeed(speedInBps));
     } catch (error) {
       console.error('Error uploading the file:', error);
     } finally {
@@ -34,13 +47,19 @@ const UploadTest = () => {
 
   return (
     <div>
-      <button onClick={testUploadSpeed} disabled={isUploading}>Test Upload Speed</button>
+      <button 
+        className="btn btn-primary mb-3" 
+        onClick={testUploadSpeed} 
+        disabled={isUploading}
+      >
+        Test Upload Speed
+      </button>
       {isUploading && (
-        <div>
-          <ProgressBar now={progress} label={`${progress}%`} />
+        <div className="progress-bar-container custom-progress-bar">
+          <ProgressBar now={progress} label={`${progress}%`} style={{ height: '30px' }} />
         </div>
       )}
-      {uploadSpeed && <p>Upload Speed: {uploadSpeed} Mbps</p>}
+      {uploadSpeed && <p className="bold-text">Upload Speed: {uploadSpeed}</p>}
     </div>
   );
 };
