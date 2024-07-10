@@ -6,14 +6,14 @@ const UploadTest = () => {
 
   const testUploadSpeed = async () => {
     const startTime = new Date().getTime();
-    const fileSizeInBytes = 5000000; // Size of your test file in bytes
+    const fileSizeInBytes = 10000000; // 10MB file size
     const testFile = new Blob([new Uint8Array(fileSizeInBytes)], { type: 'application/octet-stream' });
 
     const formData = new FormData();
     formData.append('file', testFile, 'testfile.dat');
 
     try {
-      await axios.post('https://drive.google.com/uc?export=download&id=1pGHOQ0lSlTPu51zwjeHmjw0G_CQmLnPc', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      await axios.post('https://cors-anywhere.herokuapp.com/YOUR_UPLOAD_ENDPOINT_URL', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
