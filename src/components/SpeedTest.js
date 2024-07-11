@@ -74,7 +74,9 @@ const SpeedTest = () => {
   };
 
   const testDownloadSpeed = async () => {
-    setProgress(0); // Reset progress before starting the test
+    setProgress(0); // Ensure progress is reset before starting the test
+    setDownloadSpeed(null); // Reset download speed
+
     const startTime = new Date().getTime();
     const fileSizeInBytes = 10000000; // 10MB file size
 
@@ -101,7 +103,9 @@ const SpeedTest = () => {
   };
 
   const testUploadSpeed = async () => {
-    setProgress(0); // Reset progress before starting the test
+    setProgress(0); // Ensure progress is reset before starting the test
+    setUploadSpeed(null); // Reset upload speed
+
     const startTime = new Date().getTime();
     const fileSizeInBytes = 10000000; // 10MB file size
     const testFile = new Blob([new Uint8Array(fileSizeInBytes)], {
