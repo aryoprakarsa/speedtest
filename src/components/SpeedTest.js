@@ -143,6 +143,7 @@ const SpeedTest = () => {
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
                 <li>The download speed is calculated by downloading a 10MB file, and the upload speed is calculated by uploading a 10MB file.</li>
+                <li>There is a delay of 5 seconds before starting a new test to ensure optimal results.</li>
               </ol>
             </Card.Footer>
           </Card>
