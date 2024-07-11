@@ -5,7 +5,6 @@ import { Helmet } from 'react-helmet-async';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './SpeedTestResults.css';
 
-// Define the bytesToReadableSpeed function
 const bytesToReadableSpeed = (bytes) => {
   if (bytes < 1024) {
     return `${bytes.toFixed(2)} Bps`;
@@ -93,9 +92,15 @@ const SpeedTest = () => {
     const testFile = new Blob([new Uint8Array(fileSizeInBytes)], { type: 'application/octet-stream' });
 
     try {
+      // Simulate initial connection setup delay
+      await delay(100);
+      
+      // Simulate a real network upload with varying delay
       for (let i = 0; i <= 100; i++) {
         setProgress(i);
-        await new Promise(resolve => setTimeout(resolve, 10)); // Simulate network delay
+        // Simulate variable network delay
+        const variableDelay = Math.random() * 10 + 20; // Random delay between 200ms and 500ms
+        await new Promise(resolve => setTimeout(resolve, variableDelay));
       }
 
       const endTime = new Date().getTime();
