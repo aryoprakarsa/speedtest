@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ProgressBar, Row, Col, Button, Container, Card } from 'react-bootstrap';
+import { ProgressBar, Row, Col, Button, Container, Card, Alert } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './SpeedTestResults.css';
@@ -22,13 +22,45 @@ const SpeedTest = () => {
   const [uploadSpeed, setUploadSpeed] = useState(null);
   const [progress, setProgress] = useState(0);
   const [isTesting, setIsTesting] = useState(false);
+  const [delayMessage, setDelayMessage] = useState("");
+  const [ipInfo, setIpInfo] = useState({});
+
+  useEffect(() => {
+    fetchIpInfo();
+  }, []);
+
+  const fetchIpInfo = async () => {
+    try {
+      const ipResponse = await axios.get('https://api.ipify.org?format=json');
+      const ip = ipResponse.data.ip;
+
+      const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+      setIpInfo(response.data);
+    } catch (error) {
+      console.error('Error fetching IP info:', error);
+    }
+  };
+
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   const testSpeed = async () => {
-    setIsTesting(true);
+    setDownloadSpeed(null);
+    setUploadSpeed(null);
     setProgress(0);
+    setDelayMessage("");
+    setIsTesting(true);
+
     await testDownloadSpeed();
+    setDelayMessage("Please wait a moment before starting the upload test...");
+    await delay(2000); // 2-second delay between tests
+    setDelayMessage("");
+
     await testUploadSpeed();
+    setDelayMessage("Tests are completed. Please wait 5 seconds before starting a new test.");
+    await delay(5000); // 5-second delay after tests are complete
+
     setIsTesting(false);
+    setDelayMessage("");
   };
 
   const testDownloadSpeed = async () => {
@@ -83,6 +115,13 @@ const SpeedTest = () => {
           <Card>
             <Card.Header as="h1" className="text-center">Internet Speed Test</Card.Header>
             <Card.Body className="text-center">
+              {ipInfo.ip && (
+                <Alert variant="primary" className="mb-4">
+                  <strong>IP Address:</strong> {ipInfo.ip}<br />
+                  <strong>ISP:</strong> {ipInfo.org}<br />
+                  <strong>ASN:</strong> {ipInfo.asn}
+                </Alert>
+              )}
               <Button 
                 className="mb-3 circle-button mx-auto" 
                 onClick={testSpeed} 
@@ -97,8 +136,9 @@ const SpeedTest = () => {
               )}
               {downloadSpeed && <p className="bold-text">Download Speed: {downloadSpeed}</p>}
               {uploadSpeed && <p className="bold-text">Upload Speed: {uploadSpeed}</p>}
+              {delayMessage && <p>{delayMessage}</p>}
             </Card.Body>
-            <Card.Footer className="text-left custom-card-footer">
+            <Card.Footer className="custom-card-footer">
               <strong>Note:</strong>
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
