@@ -5,14 +5,15 @@ import { Helmet } from 'react-helmet-async';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './SpeedTestResults.css';
 
-// Define the bytesToReadableSpeed function within this file
+// Define the bytesToReadableSpeed function
 const bytesToReadableSpeed = (bytes) => {
-  const speedInKbps = bytes / 1024;
-  const speedInMbps = speedInKbps / 1024;
-
-  if (speedInKbps < 1024) {
+  if (bytes < 1024) {
+    return `${bytes.toFixed(2)} Bps`;
+  } else if (bytes < 1024 * 1024) {
+    const speedInKbps = bytes / 1024;
     return `${speedInKbps.toFixed(2)} Kbps`;
   } else {
+    const speedInMbps = bytes / (1024 * 1024);
     return `${speedInMbps.toFixed(2)} Mbps`;
   }
 };

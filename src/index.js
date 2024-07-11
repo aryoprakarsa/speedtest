@@ -1,14 +1,14 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
 import './index.css';
 
-ReactDOM.render(
+const container = document.getElementById('root');
+const root = createRoot(container);
+
+root.render(
   <HelmetProvider>
     <App />
-  </HelmetProvider>,
-  document.getElementById('root')
+  </HelmetProvider>
 );
