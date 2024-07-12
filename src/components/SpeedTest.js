@@ -36,6 +36,7 @@ const SpeedTest = () => {
   const [ipInfo, setIpInfo] = useState({});
   const [loading, setLoading] = useState(true);
   const [renderTime, setRenderTime] = useState(null);
+  const [hasTested, setHasTested] = useState(false);
 
   useEffect(() => {
     const startTime = performance.now();
@@ -71,18 +72,6 @@ const SpeedTest = () => {
     }
   };
 
-  const testPing = async () => {
-    const startTime = performance.now();
-    try {
-      await axios.get("https://www.speedtest.aryo.ai");
-      const endTime = performance.now();
-      setPing((endTime - startTime).toFixed(2));
-    } catch (error) {
-      console.error("Error pinging the server:", error);
-      setPing("Error");
-    }
-  };
-
   const testSpeed = async () => {
     setPing(null);
     setDownloadSpeed(null);
@@ -91,10 +80,9 @@ const SpeedTest = () => {
     setDelayMessage("");
     clearCache();
     setIsTesting(true);
+    setHasTested(true);
 
     await testPing();
-    await delay(2000); // 2-second delay after ping test
-
     await testDownloadSpeed();
     setDelayMessage("Please wait a moment before starting the upload test...");
     await delay(2000); // 2-second delay between tests
@@ -108,6 +96,17 @@ const SpeedTest = () => {
 
     setIsTesting(false);
     setDelayMessage("");
+  };
+
+  const testPing = async () => {
+    const startTime = performance.now();
+    try {
+      await axios.get("https://www.speedtest.aryo.ai");
+      const endTime = performance.now();
+      setPing((endTime - startTime).toFixed(2));
+    } catch (error) {
+      console.error("Error pinging the server:", error);
+    }
   };
 
   const testDownloadSpeed = async () => {
@@ -219,20 +218,22 @@ const SpeedTest = () => {
                       />
                     </div>
                   )}
-                  <Row className="text-center">
-                    <Col>
-                      <p className="bold-text">Ping</p>
-                      {ping && <p>{ping} ms</p>}
-                    </Col>
-                    <Col>
-                      <p className="bold-text">Download</p>
-                      {downloadSpeed && <p>{downloadSpeed}</p>}
-                    </Col>
-                    <Col>
-                      <p className="bold-text">Upload</p>
-                      {uploadSpeed && <p>{uploadSpeed}</p>}
-                    </Col>
-                  </Row>
+                  {hasTested && (
+                    <Row>
+                      <Col>
+                        <p className="bold-text">Ping</p>
+                        <p>{ping ? `${ping} ms` : "-"}</p>
+                      </Col>
+                      <Col>
+                        <p className="bold-text">Download</p>
+                        <p>{downloadSpeed ? downloadSpeed : "-"}</p>
+                      </Col>
+                      <Col>
+                        <p className="bold-text">Upload</p>
+                        <p>{uploadSpeed ? uploadSpeed : "-"}</p>
+                      </Col>
+                    </Row>
+                  )}
                   {delayMessage && <p>{delayMessage}</p>}
                 </>
               )}
@@ -247,10 +248,10 @@ const SpeedTest = () => {
                 </li>
                 <li>
                   There is a delay of 10 seconds before starting a new test to
-                  ensure optimal results.
+                  ensure optimal result.
                 </li>
                 <li>
-                  This application is intended for testing purposes and not for
+                  This application is intended for testing purpose and not for
                   commercial use, so no data logging is necessary.
                 </li>
               </ol>
