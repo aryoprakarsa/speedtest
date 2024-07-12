@@ -34,9 +34,14 @@ const SpeedTest = () => {
   const [delayMessage, setDelayMessage] = useState("");
   const [ipInfo, setIpInfo] = useState({});
   const [loading, setLoading] = useState(true);
+  const [renderTime, setRenderTime] = useState(null);
 
   useEffect(() => {
-    fetchIpInfo();
+    const startTime = performance.now();
+    fetchIpInfo().finally(() => {
+      const endTime = performance.now();
+      setRenderTime((endTime - startTime).toFixed(2));
+    });
   }, []);
 
   const fetchIpInfo = async () => {
@@ -166,7 +171,7 @@ const SpeedTest = () => {
             <Card.Body className="text-center">
               {loading ? (
                 <div className="text-center mt-4">
-                  <Spinner animation="grow" role="status">
+                  <Spinner animation="grow" variant="primary" role="status">
                     <span className="visually-hidden">Loading...</span>
                   </Spinner>
                 </div>
@@ -226,6 +231,7 @@ const SpeedTest = () => {
               </ol>
             </Card.Footer>
           </Card>
+          <p className="text-center mt-4">{renderTime && `${renderTime}`}</p>
         </Col>
       </Row>
     </Container>
