@@ -222,10 +222,10 @@ const SpeedTest = () => {
                 </li>
                 <li>
                   There is a delay of 10 seconds before starting a new test to
-                  ensure optimal results.
+                  ensure optimal result.
                 </li>
                 <li>
-                  This application is intended for testing purposes and not for
+                  This application is intended for testing purpose and not for
                   commercial use, so no data logging is necessary.
                 </li>
               </ol>
