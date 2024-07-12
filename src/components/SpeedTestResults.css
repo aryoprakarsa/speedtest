@@ -22,7 +22,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 auto;
+    margin: 0 auto 4px;
+    /* Added margin-bottom */
     animation: pulse 2s infinite;
     border: 2px solid #007bff;
     background-color: transparent;

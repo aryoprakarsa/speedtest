@@ -219,7 +219,7 @@ const SpeedTest = () => {
                     </div>
                   )}
                   {hasTested && (
-                    <Row>
+                    <Row className="mt-4">
                       <Col>
                         <p className="bold-text">Ping</p>
                         <p>{ping ? `${ping} ms` : "-"}</p>
