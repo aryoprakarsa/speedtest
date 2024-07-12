@@ -140,7 +140,7 @@ const SpeedTest = () => {
       for (let i = 0; i <= 100; i++) {
         setProgress(i);
         // Simulate variable network delay
-        const variableDelay = Math.random() * 1 + 1; // Random delay
+        const variableDelay = Math.random() * 10 + 10; // Random delay
         await new Promise((resolve) => setTimeout(resolve, variableDelay));
       }
 
