@@ -123,7 +123,7 @@ const SpeedTest = () => {
 
     setStatusMessage(""); // Clear the status message after tests are completed
     setDelayMessage(
-      "Tests are completed. Please wait 10 seconds before starting a new test."
+      "Please wait 10 seconds before starting a new test."
     );
     await delay(10000); // 10-second delay after tests are complete
 
