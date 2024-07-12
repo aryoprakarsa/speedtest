@@ -17,13 +17,13 @@ import "./SpeedTestResults.css";
 
 const bytesToReadableSpeed = (bytes) => {
   if (bytes < 1024) {
-    return `${bytes.toFixed(2)} Bps`;
+    return { value: bytes.toFixed(2), unit: "Bps" };
   } else if (bytes < 1024 * 1024) {
     const speedInKbps = bytes / 1024;
-    return `${speedInKbps.toFixed(2)} Kbps`;
+    return { value: speedInKbps.toFixed(2), unit: "Kbps" };
   } else {
     const speedInMbps = bytes / (1024 * 1024);
-    return `${speedInMbps.toFixed(2)} Mbps`;
+    return { value: speedInMbps.toFixed(2), unit: "Mbps" };
   }
 };
 
@@ -42,6 +42,8 @@ const SpeedTest = () => {
   const [pingEnd, setPingEnd] = useState(0);
   const [downloadEnd, setDownloadEnd] = useState(0);
   const [uploadEnd, setUploadEnd] = useState(0);
+  const [downloadUnit, setDownloadUnit] = useState("");
+  const [uploadUnit, setUploadUnit] = useState("");
 
   useEffect(() => {
     const startTime = performance.now();
@@ -121,6 +123,7 @@ const SpeedTest = () => {
     setStatusMessage("Testing download speed...");
     setDownloadEnd(0);
     await testDownloadSpeed();
+
     setDelayMessage("Please wait a moment before starting the upload test...");
     await delay(2000); // 2-second delay between tests
     setDelayMessage("");
@@ -156,15 +159,19 @@ const SpeedTest = () => {
             100
           );
           setProgress(percentCompleted);
+
+          const durationInSeconds = (new Date().getTime() - startTime) / 1000;
+          const speedInBps = (loaded * 8) / durationInSeconds;
+          const { value, unit } = bytesToReadableSpeed(speedInBps);
+          setDownloadEnd(parseFloat(value));
+          setDownloadUnit(unit);
         },
       });
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const readableSpeed = bytesToReadableSpeed(speedInBps);
-      const [value] = readableSpeed.split(" ");
-      setDownloadEnd(parseFloat(value));
-      setDownloadSpeed(readableSpeed);
+      const { value, unit } = bytesToReadableSpeed(speedInBps);
+      setDownloadSpeed(`${value} ${unit}`);
     } catch (error) {
       console.error("Error downloading the file:", error);
     }
@@ -190,15 +197,20 @@ const SpeedTest = () => {
         // Simulate variable network delay
         const variableDelay = Math.random() * 10 + 10; // Random delay
         await new Promise((resolve) => setTimeout(resolve, variableDelay));
+
+        const durationInSeconds = (new Date().getTime() - startTime) / 1000;
+        const speedInBps =
+          (((fileSizeInBytes * i) / 100) * 8) / durationInSeconds;
+        const { value, unit } = bytesToReadableSpeed(speedInBps);
+        setUploadEnd(parseFloat(value));
+        setUploadUnit(unit);
       }
 
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const readableSpeed = bytesToReadableSpeed(speedInBps);
-      const [value] = readableSpeed.split(" ");
-      setUploadEnd(parseFloat(value));
-      setUploadSpeed(readableSpeed);
+      const { value, unit } = bytesToReadableSpeed(speedInBps);
+      setUploadSpeed(`${value} ${unit}`);
     } catch (error) {
       console.error("Error uploading the file:", error);
     }
@@ -256,50 +268,36 @@ const SpeedTest = () => {
                       <Row className="mt-4">
                         <Col>
                           <p className="bold-text">Ping</p>
-                          {ping !== null ? (
+                          <p>
                             <CountUp
-                              start={0}
                               end={pingEnd}
                               duration={5}
+                              decimals={2}
                               suffix=" ms"
                             />
-                          ) : (
-                            <p>{ping !== null ? `${ping} ms` : ""}</p>
-                          )}
+                          </p>
                         </Col>
                         <Col>
                           <p className="bold-text">Download</p>
-                          {downloadSpeed ? (
+                          <p>
                             <CountUp
-                              start={0}
                               end={downloadEnd}
-                              duration={5}
-                              suffix={
-                                downloadSpeed
-                                  ? ` ${downloadSpeed.split(" ")[1]}`
-                                  : ""
-                              }
+                              duration={10}
+                              decimals={2}
+                              suffix={` ${downloadUnit}`}
                             />
-                          ) : (
-                            <p>{downloadSpeed ? downloadSpeed : ""}</p>
-                          )}
+                          </p>
                         </Col>
                         <Col>
                           <p className="bold-text">Upload</p>
-                          {uploadSpeed ? (
+                          <p>
                             <CountUp
-                              start={0}
                               end={uploadEnd}
-                              duration={5}
-                              suffix={
-                                uploadSpeed
-                                  ? ` ${uploadSpeed.split(" ")[1]}`
-                                  : ""
-                              }
+                              duration={10}
+                              decimals={2}
+                              suffix={` ${uploadUnit}`}
                             />
-                          ) : (
-                            <p>{uploadSpeed ? uploadSpeed : ""}</p>
-                          )}
+                          </p>
                         </Col>
                       </Row>
                       <p className="text-center mt-4">{statusMessage}</p>
@@ -329,6 +327,10 @@ const SpeedTest = () => {
               <strong>Note:</strong>
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
+                <li>
+                  The download speed is calculated by downloading a 30MB file,
+                  and the upload speed is calculated by uploading a 30MB file.
+                </li>
                 <li>
                   There is a delay of 10 seconds before starting a new test to
                   ensure optimal result.
