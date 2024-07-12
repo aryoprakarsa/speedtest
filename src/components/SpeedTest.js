@@ -8,6 +8,7 @@ import {
   Container,
   Card,
   Alert,
+  Spinner,
 } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -32,6 +33,7 @@ const SpeedTest = () => {
   const [isTesting, setIsTesting] = useState(false);
   const [delayMessage, setDelayMessage] = useState("");
   const [ipInfo, setIpInfo] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchIpInfo();
@@ -46,6 +48,8 @@ const SpeedTest = () => {
       setIpInfo(response.data);
     } catch (error) {
       console.error("Error fetching IP info:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,7 +93,7 @@ const SpeedTest = () => {
     setDownloadSpeed(null); // Reset download speed
 
     const startTime = new Date().getTime();
-    const fileSizeInBytes = 10000000; // 10MB file size
+    const fileSizeInBytes = 30000000; // 30MB file size
 
     try {
       await axios.get("https://www.speedtest.aryo.ai/test-file/30mb.zip", {
@@ -118,7 +122,7 @@ const SpeedTest = () => {
     setUploadSpeed(null); // Reset upload speed
 
     const startTime = new Date().getTime();
-    const fileSizeInBytes = 10000000; // 10MB file size
+    const fileSizeInBytes = 30000000; // 30MB file size
     const testFile = new Blob([new Uint8Array(fileSizeInBytes)], {
       type: "application/octet-stream",
     });
@@ -131,7 +135,7 @@ const SpeedTest = () => {
       for (let i = 0; i <= 100; i++) {
         setProgress(i);
         // Simulate variable network delay
-        const variableDelay = Math.random() * 10 + 20; // Random delay
+        const variableDelay = Math.random() * 0 + 0; // Random delay
         await new Promise((resolve) => setTimeout(resolve, variableDelay));
       }
 
@@ -160,50 +164,64 @@ const SpeedTest = () => {
               Internet Speed Test
             </Card.Header>
             <Card.Body className="text-center">
-              {ipInfo.ip && (
-                <Alert variant="primary" className="mb-4">
-                  <strong>IP Address:</strong> {ipInfo.ip}
-                  <br />
-                  <strong>ISP:</strong> {ipInfo.org}
-                  <br />
-                  <strong>ASN:</strong> {ipInfo.asn}
-                </Alert>
-              )}
-              <Button
-                className="mb-3 circle-button mx-auto"
-                onClick={testSpeed}
-                disabled={isTesting}
-              >
-                Start!
-              </Button>
-              {isTesting && (
-                <div className="progress-bar-container custom-progress-bar">
-                  <ProgressBar
-                    now={progress}
-                    label={`${progress}%`}
-                    style={{ height: "30px" }}
-                  />
+              {loading ? (
+                <div className="text-center mt-4">
+                  <Spinner animation="grow" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </Spinner>
                 </div>
+              ) : (
+                <>
+                  {ipInfo.ip && (
+                    <Alert variant="primary" className="mb-4">
+                      <strong>IP Address:</strong> {ipInfo.ip}
+                      <br />
+                      <strong>ISP:</strong> {ipInfo.org}
+                      <br />
+                      <strong>ASN:</strong> {ipInfo.asn}
+                    </Alert>
+                  )}
+                  <Button
+                    className="mb-3 circle-button mx-auto"
+                    onClick={testSpeed}
+                    disabled={isTesting}
+                  >
+                    Start!
+                  </Button>
+                  {isTesting && (
+                    <div className="progress-bar-container custom-progress-bar">
+                      <ProgressBar
+                        now={progress}
+                        label={`${progress}%`}
+                        style={{ height: "30px" }}
+                      />
+                    </div>
+                  )}
+                  {downloadSpeed && (
+                    <p className="bold-text">Download Speed: {downloadSpeed}</p>
+                  )}
+                  {uploadSpeed && (
+                    <p className="bold-text">Upload Speed: {uploadSpeed}</p>
+                  )}
+                  {delayMessage && <p>{delayMessage}</p>}
+                </>
               )}
-              {downloadSpeed && (
-                <p className="bold-text">Download Speed: {downloadSpeed}</p>
-              )}
-              {uploadSpeed && (
-                <p className="bold-text">Upload Speed: {uploadSpeed}</p>
-              )}
-              {delayMessage && <p>{delayMessage}</p>}
             </Card.Body>
             <Card.Footer className="custom-card-footer">
               <strong>Note:</strong>
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
                 <li>
-                  The download speed is calculated by downloading a 10MB file,
-                  and the upload speed is calculated by uploading a 10MB file.
+                  The download speed is calculated by downloading a 30MB file,
+                  and the upload speed is calculated by uploading a 30MB file.
                 </li>
                 <li>
                   There is a delay of 10 seconds before starting a new test to
                   ensure optimal results.
+                </li>
+                <li>
+                  This application is intended for testing purposes and not for
+                  commercial use, so no data logging is necessary.
                 </li>
               </ol>
             </Card.Footer>
