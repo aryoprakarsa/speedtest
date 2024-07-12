@@ -221,8 +221,6 @@ const SpeedTest = () => {
                       <strong>ISP:</strong> {ipInfo.org}
                       <br />
                       <strong>ASN:</strong> {ipInfo.asn}
-                      <br />
-                      <strong>BGN:</strong> {ipInfo.bgn}
                     </Alert>
                   )}
                   <Button
