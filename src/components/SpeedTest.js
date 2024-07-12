@@ -17,13 +17,13 @@ import "./SpeedTestResults.css";
 
 const bytesToReadableSpeed = (bytes) => {
   if (bytes < 1024) {
-    return { value: bytes.toFixed(2), unit: "Bps" };
+    return { speed: bytes.toFixed(2), unit: "Bps" };
   } else if (bytes < 1024 * 1024) {
     const speedInKbps = bytes / 1024;
-    return { value: speedInKbps.toFixed(2), unit: "Kbps" };
+    return { speed: speedInKbps.toFixed(2), unit: "Kbps" };
   } else {
     const speedInMbps = bytes / (1024 * 1024);
-    return { value: speedInMbps.toFixed(2), unit: "Mbps" };
+    return { speed: speedInMbps.toFixed(2), unit: "Mbps" };
   }
 };
 
@@ -39,7 +39,6 @@ const SpeedTest = () => {
   const [renderTime, setRenderTime] = useState(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [showResults, setShowResults] = useState(false);
-  const [pingEnd, setPingEnd] = useState(0);
   const [downloadEnd, setDownloadEnd] = useState(0);
   const [uploadEnd, setUploadEnd] = useState(0);
   const [downloadUnit, setDownloadUnit] = useState("");
@@ -79,6 +78,19 @@ const SpeedTest = () => {
     }
   };
 
+  const resetTestState = () => {
+    setPing(null);
+    setDownloadSpeed(null);
+    setUploadSpeed(null);
+    setProgress(0);
+    setDownloadEnd(0);
+    setUploadEnd(0);
+    setDownloadUnit("");
+    setUploadUnit("");
+    setShowResults(false);
+    clearCache();
+  };
+
   const testPing = async () => {
     const pingTimes = [];
     const pingDuration = 5000; // 5000 milliseconds
@@ -99,7 +111,6 @@ const SpeedTest = () => {
 
     if (pingTimes.length > 0) {
       const averagePing = pingTimes.reduce((a, b) => a + b) / pingTimes.length;
-      setPingEnd(averagePing.toFixed(2));
       setPing(averagePing.toFixed(2));
     } else {
       setPing(null);
@@ -107,33 +118,25 @@ const SpeedTest = () => {
   };
 
   const testSpeed = async () => {
-    setPing(null);
-    setDownloadSpeed(null);
-    setUploadSpeed(null);
-    setProgress(0);
-    setDelayMessage("");
-    clearCache();
+    resetTestState();
     setIsTesting(true);
-    setShowResults(false);
-
     setStatusMessage("Testing ping...");
-    setPingEnd(0);
+
     await testPing();
 
     setStatusMessage("Testing download speed...");
-    setDownloadEnd(0);
     await testDownloadSpeed();
-
     setDelayMessage("Please wait a moment before starting the upload test...");
     await delay(2000); // 2-second delay between tests
     setDelayMessage("");
 
     setStatusMessage("Testing upload speed...");
-    setUploadEnd(0);
     await testUploadSpeed();
 
     setStatusMessage(""); // Clear the status message after tests are completed
-    setDelayMessage("Please wait 10 seconds before starting a new test.");
+    setDelayMessage(
+      "Tests are completed. Please wait 10 seconds before starting a new test."
+    );
     await delay(10000); // 10-second delay after tests are complete
 
     setIsTesting(false);
@@ -143,7 +146,6 @@ const SpeedTest = () => {
 
   const testDownloadSpeed = async () => {
     setProgress(0); // Ensure progress is reset before starting the test
-    setDownloadSpeed(null); // Reset download speed
 
     const startTime = new Date().getTime();
     const fileSizeInBytes = 30000000; // 30MB file size
@@ -162,16 +164,16 @@ const SpeedTest = () => {
 
           const durationInSeconds = (new Date().getTime() - startTime) / 1000;
           const speedInBps = (loaded * 8) / durationInSeconds;
-          const { value, unit } = bytesToReadableSpeed(speedInBps);
-          setDownloadEnd(parseFloat(value));
+          const { speed, unit } = bytesToReadableSpeed(speedInBps);
+          setDownloadEnd(speed);
           setDownloadUnit(unit);
         },
       });
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const { value, unit } = bytesToReadableSpeed(speedInBps);
-      setDownloadSpeed(`${value} ${unit}`);
+      const { speed, unit } = bytesToReadableSpeed(speedInBps);
+      setDownloadSpeed(`${speed} ${unit}`);
     } catch (error) {
       console.error("Error downloading the file:", error);
     }
@@ -179,7 +181,6 @@ const SpeedTest = () => {
 
   const testUploadSpeed = async () => {
     setProgress(0); // Ensure progress is reset before starting the test
-    setUploadSpeed(null); // Reset upload speed
 
     const startTime = new Date().getTime();
     const fileSizeInBytes = 30000000; // 30MB file size
@@ -200,17 +201,17 @@ const SpeedTest = () => {
 
         const durationInSeconds = (new Date().getTime() - startTime) / 1000;
         const speedInBps =
-          (((fileSizeInBytes * i) / 100) * 8) / durationInSeconds;
-        const { value, unit } = bytesToReadableSpeed(speedInBps);
-        setUploadEnd(parseFloat(value));
+          (fileSizeInBytes * i * 8) / (100 * durationInSeconds);
+        const { speed, unit } = bytesToReadableSpeed(speedInBps);
+        setUploadEnd(speed);
         setUploadUnit(unit);
       }
 
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const { value, unit } = bytesToReadableSpeed(speedInBps);
-      setUploadSpeed(`${value} ${unit}`);
+      const { speed, unit } = bytesToReadableSpeed(speedInBps);
+      setUploadSpeed(`${speed} ${unit}`);
     } catch (error) {
       console.error("Error uploading the file:", error);
     }
@@ -268,36 +269,27 @@ const SpeedTest = () => {
                       <Row className="mt-4">
                         <Col>
                           <p className="bold-text">Ping</p>
-                          <p>
-                            <CountUp
-                              end={pingEnd}
-                              duration={5}
-                              decimals={2}
-                              suffix=" ms"
-                            />
-                          </p>
+                          <CountUp
+                            end={ping ? parseFloat(ping) : 0}
+                            duration={5}
+                            suffix=" ms"
+                          />
                         </Col>
                         <Col>
                           <p className="bold-text">Download</p>
-                          <p>
-                            <CountUp
-                              end={downloadEnd}
-                              duration={10}
-                              decimals={2}
-                              suffix={` ${downloadUnit}`}
-                            />
-                          </p>
+                          <CountUp
+                            end={downloadEnd}
+                            duration={10}
+                            suffix={` ${downloadUnit}`}
+                          />
                         </Col>
                         <Col>
                           <p className="bold-text">Upload</p>
-                          <p>
-                            <CountUp
-                              end={uploadEnd}
-                              duration={10}
-                              decimals={2}
-                              suffix={` ${uploadUnit}`}
-                            />
-                          </p>
+                          <CountUp
+                            end={uploadEnd}
+                            duration={10}
+                            suffix={` ${uploadUnit}`}
+                          />
                         </Col>
                       </Row>
                       <p className="text-center mt-4">{statusMessage}</p>
@@ -327,10 +319,6 @@ const SpeedTest = () => {
               <strong>Note:</strong>
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
-                <li>
-                  The download speed is calculated by downloading a 30MB file,
-                  and the upload speed is calculated by uploading a 30MB file.
-                </li>
                 <li>
                   There is a delay of 10 seconds before starting a new test to
                   ensure optimal result.
