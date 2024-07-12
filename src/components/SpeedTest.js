@@ -36,7 +36,8 @@ const SpeedTest = () => {
   const [ipInfo, setIpInfo] = useState({});
   const [loading, setLoading] = useState(true);
   const [renderTime, setRenderTime] = useState(null);
-  const [hasTested, setHasTested] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
     const startTime = performance.now();
@@ -72,6 +73,32 @@ const SpeedTest = () => {
     }
   };
 
+  const testPing = async () => {
+    const pingTimes = [];
+    const pingDuration = 5000; // 5000 milliseconds
+    const interval = 200; // Interval between pings
+    const endTime = performance.now() + pingDuration;
+
+    while (performance.now() < endTime) {
+      const startTime = performance.now();
+      try {
+        await axios.get("https://www.speedtest.aryo.ai");
+        const pingTime = performance.now() - startTime;
+        pingTimes.push(pingTime);
+      } catch (error) {
+        console.error("Error pinging the server:", error);
+      }
+      await delay(interval);
+    }
+
+    if (pingTimes.length > 0) {
+      const averagePing = pingTimes.reduce((a, b) => a + b) / pingTimes.length;
+      setPing(averagePing.toFixed(2));
+    } else {
+      setPing(null);
+    }
+  };
+
   const testSpeed = async () => {
     setPing(null);
     setDownloadSpeed(null);
@@ -80,15 +107,21 @@ const SpeedTest = () => {
     setDelayMessage("");
     clearCache();
     setIsTesting(true);
-    setHasTested(true);
+    setShowResults(false);
 
+    setStatusMessage("Testing ping...");
     await testPing();
+
+    setStatusMessage("Testing download speed...");
     await testDownloadSpeed();
     setDelayMessage("Please wait a moment before starting the upload test...");
     await delay(2000); // 2-second delay between tests
     setDelayMessage("");
 
+    setStatusMessage("Testing upload speed...");
     await testUploadSpeed();
+
+    setStatusMessage(""); // Clear the status message after tests are completed
     setDelayMessage(
       "Tests are completed. Please wait 10 seconds before starting a new test."
     );
@@ -96,17 +129,7 @@ const SpeedTest = () => {
 
     setIsTesting(false);
     setDelayMessage("");
-  };
-
-  const testPing = async () => {
-    const startTime = performance.now();
-    try {
-      await axios.get("https://www.speedtest.aryo.ai");
-      const endTime = performance.now();
-      setPing((endTime - startTime).toFixed(2));
-    } catch (error) {
-      console.error("Error pinging the server:", error);
-    }
+    setShowResults(true); // Show results after the test
   };
 
   const testDownloadSpeed = async () => {
@@ -210,27 +233,44 @@ const SpeedTest = () => {
                     Start!
                   </Button>
                   {isTesting && (
-                    <div className="progress-bar-container custom-progress-bar">
-                      <ProgressBar
-                        now={progress}
-                        label={`${progress}%`}
-                        style={{ height: "30px" }}
-                      />
-                    </div>
+                    <>
+                      <div className="progress-bar-container custom-progress-bar">
+                        <ProgressBar
+                          now={progress}
+                          label={`${progress}%`}
+                          style={{ height: "30px" }}
+                        />
+                      </div>
+                      <Row className="mt-4">
+                        <Col>
+                          <p className="bold-text">Ping</p>
+                          <p>{ping !== null ? `${ping} ms` : ""}</p>
+                        </Col>
+                        <Col>
+                          <p className="bold-text">Download</p>
+                          <p>{downloadSpeed ? downloadSpeed : ""}</p>
+                        </Col>
+                        <Col>
+                          <p className="bold-text">Upload</p>
+                          <p>{uploadSpeed ? uploadSpeed : ""}</p>
+                        </Col>
+                      </Row>
+                      <p className="text-center mt-4">{statusMessage}</p>
+                    </>
                   )}
-                  {hasTested && (
+                  {showResults && (
                     <Row className="mt-4">
                       <Col>
                         <p className="bold-text">Ping</p>
-                        <p>{ping ? `${ping} ms` : "-"}</p>
+                        <p>{ping !== null ? `${ping} ms` : "N/A"}</p>
                       </Col>
                       <Col>
                         <p className="bold-text">Download</p>
-                        <p>{downloadSpeed ? downloadSpeed : "-"}</p>
+                        <p>{downloadSpeed ? downloadSpeed : "N/A"}</p>
                       </Col>
                       <Col>
                         <p className="bold-text">Upload</p>
-                        <p>{uploadSpeed ? uploadSpeed : "-"}</p>
+                        <p>{uploadSpeed ? uploadSpeed : "N/A"}</p>
                       </Col>
                     </Row>
                   )}
@@ -242,10 +282,6 @@ const SpeedTest = () => {
               <strong>Note:</strong>
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
-                <li>
-                  The download speed is calculated by downloading a 30MB file,
-                  and the upload speed is calculated by uploading a 30MB file.
-                </li>
                 <li>
                   There is a delay of 10 seconds before starting a new test to
                   ensure optimal result.
