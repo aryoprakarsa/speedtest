@@ -134,9 +134,7 @@ const SpeedTest = () => {
     await testUploadSpeed();
 
     setStatusMessage(""); // Clear the status message after tests are completed
-    setDelayMessage(
-      "Tests are completed. Please wait 10 seconds before starting a new test."
-    );
+    setDelayMessage("Please wait 10 seconds before taking another test.");
     await delay(10000); // 10-second delay after tests are complete
 
     setIsTesting(false);
@@ -320,8 +318,8 @@ const SpeedTest = () => {
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
                 <li>
-                  There is a delay of 10 seconds before starting a new test to
-                  ensure optimal result.
+                  There is a delay of 10 seconds before taking another test to
+                  ensure optimal results.
                 </li>
                 <li>
                   This application is intended for testing purpose and not for
