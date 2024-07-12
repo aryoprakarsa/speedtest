@@ -89,7 +89,7 @@ const SpeedTest = () => {
     const fileSizeInBytes = 10000000; // 10MB file size
 
     try {
-      await axios.get("https://www.speedtest.aryo.ai/test-file/100MB.bin", {
+      await axios.get("https://www.speedtest.aryo.ai/test-file/10MB.bin", {
         responseType: "arraybuffer",
         onDownloadProgress: (progressEvent) => {
           const loaded = progressEvent.loaded;
