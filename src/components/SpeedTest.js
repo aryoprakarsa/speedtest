@@ -37,15 +37,6 @@ const SpeedTest = () => {
     fetchIpInfo();
   }, []);
 
-  useEffect(() => {
-    if (!isTesting) {
-      setDownloadSpeed(null);
-      setUploadSpeed(null);
-      setProgress(0);
-      clearCache();
-    }
-  }, [isTesting]);
-
   const fetchIpInfo = async () => {
     try {
       const ipResponse = await axios.get("https://api.ipify.org?format=json");
@@ -71,11 +62,12 @@ const SpeedTest = () => {
   };
 
   const testSpeed = async () => {
-    setIsTesting(true);
     setDownloadSpeed(null);
     setUploadSpeed(null);
     setProgress(0);
     setDelayMessage("");
+    clearCache();
+    setIsTesting(true);
 
     await testDownloadSpeed();
     setDelayMessage("Please wait a moment before starting the upload test...");
@@ -100,7 +92,7 @@ const SpeedTest = () => {
     const fileSizeInBytes = 10000000; // 10MB file size
 
     try {
-      await axios.get("https://www.speedtest.aryo.ai/test-file/10MB.bin", {
+      await axios.get("https://www.speedtest.aryo.ai/test-file/50MB.zip", {
         responseType: "arraybuffer",
         onDownloadProgress: (progressEvent) => {
           const loaded = progressEvent.loaded;
@@ -206,8 +198,8 @@ const SpeedTest = () => {
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
                 <li>
-                  The download speed is calculated by downloading a 10MB file,
-                  and the upload speed is calculated by uploading a 10MB file.
+                  The download speed is calculated by downloading a 50MB file,
+                  and the upload speed is calculated by uploading a 50MB file.
                 </li>
                 <li>
                   There is a delay of 10 seconds before starting a new test to
