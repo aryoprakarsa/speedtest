@@ -316,7 +316,6 @@ const SpeedTest = () => {
             <Card.Footer className="custom-card-footer">
               <strong>Note:</strong>
               <ol className="custom-list">
-                <li>The test server uses GitHub servers.</li>
                 <li>
                   There is a delay of 10 seconds before taking another test to
                   ensure optimal results.
