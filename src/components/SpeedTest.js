@@ -42,6 +42,7 @@ const SpeedTest = () => {
       setDownloadSpeed(null);
       setUploadSpeed(null);
       setProgress(0);
+      clearCache();
     }
   }, [isTesting]);
 
@@ -58,6 +59,16 @@ const SpeedTest = () => {
   };
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const clearCache = () => {
+    if ("caches" in window) {
+      caches.keys().then((names) => {
+        names.forEach((name) => {
+          caches.delete(name);
+        });
+      });
+    }
+  };
 
   const testSpeed = async () => {
     setIsTesting(true);
@@ -195,8 +206,8 @@ const SpeedTest = () => {
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
                 <li>
-                  The download speed is calculated by downloading a 100MB file,
-                  and the upload speed is calculated by uploading a 100MB file.
+                  The download speed is calculated by downloading a 10MB file,
+                  and the upload speed is calculated by uploading a 10MB file.
                 </li>
                 <li>
                   There is a delay of 10 seconds before starting a new test to
