@@ -314,7 +314,7 @@ const SpeedTest = () => {
               )}
             </Card.Body>
             <Card.Footer className="custom-card-footer">
-              <strong>Note:</strong>
+              <strong>Notes:</strong>
               <ol className="custom-list">
                 <li>
                   There is a delay of 10 seconds before taking another test to
