@@ -92,7 +92,7 @@ const SpeedTest = () => {
     const fileSizeInBytes = 10000000; // 10MB file size
 
     try {
-      await axios.get("https://www.speedtest.aryo.ai/test-file/50MB.zip", {
+      await axios.get("https://www.speedtest.aryo.ai/test-file/10MB.bin", {
         responseType: "arraybuffer",
         onDownloadProgress: (progressEvent) => {
           const loaded = progressEvent.loaded;
@@ -198,8 +198,8 @@ const SpeedTest = () => {
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
                 <li>
-                  The download speed is calculated by downloading a 50MB file,
-                  and the upload speed is calculated by uploading a 50MB file.
+                  The download speed is calculated by downloading a 10MB file,
+                  and the upload speed is calculated by uploading a 10MB file.
                 </li>
                 <li>
                   There is a delay of 10 seconds before starting a new test to
