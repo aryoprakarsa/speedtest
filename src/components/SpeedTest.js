@@ -37,6 +37,14 @@ const SpeedTest = () => {
     fetchIpInfo();
   }, []);
 
+  useEffect(() => {
+    if (!isTesting) {
+      setDownloadSpeed(null);
+      setUploadSpeed(null);
+      setProgress(0);
+    }
+  }, [isTesting]);
+
   const fetchIpInfo = async () => {
     try {
       const ipResponse = await axios.get("https://api.ipify.org?format=json");
@@ -52,11 +60,11 @@ const SpeedTest = () => {
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const testSpeed = async () => {
+    setIsTesting(true);
     setDownloadSpeed(null);
     setUploadSpeed(null);
     setProgress(0);
     setDelayMessage("");
-    setIsTesting(true);
 
     await testDownloadSpeed();
     setDelayMessage("Please wait a moment before starting the upload test...");
