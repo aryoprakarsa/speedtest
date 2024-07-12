@@ -11,6 +11,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
+import CountUp from "react-countup";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./SpeedTestResults.css";
 
@@ -38,6 +39,9 @@ const SpeedTest = () => {
   const [renderTime, setRenderTime] = useState(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [showResults, setShowResults] = useState(false);
+  const [pingEnd, setPingEnd] = useState(0);
+  const [downloadEnd, setDownloadEnd] = useState(0);
+  const [uploadEnd, setUploadEnd] = useState(0);
 
   useEffect(() => {
     const startTime = performance.now();
@@ -93,6 +97,7 @@ const SpeedTest = () => {
 
     if (pingTimes.length > 0) {
       const averagePing = pingTimes.reduce((a, b) => a + b) / pingTimes.length;
+      setPingEnd(averagePing.toFixed(2));
       setPing(averagePing.toFixed(2));
     } else {
       setPing(null);
@@ -110,19 +115,22 @@ const SpeedTest = () => {
     setShowResults(false);
 
     setStatusMessage("Testing ping...");
+    setPingEnd(0);
     await testPing();
 
     setStatusMessage("Testing download speed...");
+    setDownloadEnd(0);
     await testDownloadSpeed();
     setDelayMessage("Please wait a moment before starting the upload test...");
     await delay(2000); // 2-second delay between tests
     setDelayMessage("");
 
     setStatusMessage("Testing upload speed...");
+    setUploadEnd(0);
     await testUploadSpeed();
 
     setStatusMessage(""); // Clear the status message after tests are completed
-    setDelayMessage("Please wait 10 seconds before taking another test.");
+    setDelayMessage("Please wait 10 seconds before starting a new test.");
     await delay(10000); // 10-second delay after tests are complete
 
     setIsTesting(false);
@@ -153,7 +161,10 @@ const SpeedTest = () => {
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      setDownloadSpeed(bytesToReadableSpeed(speedInBps));
+      const readableSpeed = bytesToReadableSpeed(speedInBps);
+      const [value] = readableSpeed.split(" ");
+      setDownloadEnd(parseFloat(value));
+      setDownloadSpeed(readableSpeed);
     } catch (error) {
       console.error("Error downloading the file:", error);
     }
@@ -184,7 +195,10 @@ const SpeedTest = () => {
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      setUploadSpeed(bytesToReadableSpeed(speedInBps));
+      const readableSpeed = bytesToReadableSpeed(speedInBps);
+      const [value] = readableSpeed.split(" ");
+      setUploadEnd(parseFloat(value));
+      setUploadSpeed(readableSpeed);
     } catch (error) {
       console.error("Error uploading the file:", error);
     }
@@ -242,15 +256,50 @@ const SpeedTest = () => {
                       <Row className="mt-4">
                         <Col>
                           <p className="bold-text">Ping</p>
-                          <p>{ping !== null ? `${ping} ms` : ""}</p>
+                          {ping !== null ? (
+                            <CountUp
+                              start={0}
+                              end={pingEnd}
+                              duration={5}
+                              suffix=" ms"
+                            />
+                          ) : (
+                            <p>{ping !== null ? `${ping} ms` : ""}</p>
+                          )}
                         </Col>
                         <Col>
                           <p className="bold-text">Download</p>
-                          <p>{downloadSpeed ? downloadSpeed : ""}</p>
+                          {downloadSpeed ? (
+                            <CountUp
+                              start={0}
+                              end={downloadEnd}
+                              duration={5}
+                              suffix={
+                                downloadSpeed
+                                  ? ` ${downloadSpeed.split(" ")[1]}`
+                                  : ""
+                              }
+                            />
+                          ) : (
+                            <p>{downloadSpeed ? downloadSpeed : ""}</p>
+                          )}
                         </Col>
                         <Col>
                           <p className="bold-text">Upload</p>
-                          <p>{uploadSpeed ? uploadSpeed : ""}</p>
+                          {uploadSpeed ? (
+                            <CountUp
+                              start={0}
+                              end={uploadEnd}
+                              duration={5}
+                              suffix={
+                                uploadSpeed
+                                  ? ` ${uploadSpeed.split(" ")[1]}`
+                                  : ""
+                              }
+                            />
+                          ) : (
+                            <p>{uploadSpeed ? uploadSpeed : ""}</p>
+                          )}
                         </Col>
                       </Row>
                       <p className="text-center mt-4">{statusMessage}</p>
@@ -281,8 +330,8 @@ const SpeedTest = () => {
               <ol className="custom-list">
                 <li>The test server uses GitHub servers.</li>
                 <li>
-                  There is a delay of 10 seconds before taking another test to
-                  ensure optimal results.
+                  There is a delay of 10 seconds before starting a new test to
+                  ensure optimal result.
                 </li>
                 <li>
                   This application is intended for testing purpose and not for
