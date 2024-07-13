@@ -1,3 +1,7 @@
+body {
+    background-color: #f8f9fa;
+}
+
 .bold-text {
     font-weight: bold;
     font-size: 20px;
@@ -14,53 +18,78 @@
 
 .circle-button {
     border-radius: 50%;
-    padding: 20px 40px;
-    font-size: 16px;
+    font-size: 18px;
     text-align: center;
     width: 150px;
     height: 150px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 auto 4px;
-    /* Added margin-bottom */
-    animation: pulse 2s infinite;
+    margin: 0 auto 20px;
     border: 2px solid #007bff;
-    background-color: transparent;
-    color: #007bff;
-    transition: background-color 0.3s, color 0.3s;
+    background-color: #007bff;
+    color: #ffffff;
+    transition: all 0.3s ease;
 }
 
-.circle-button:hover {
-    background-color: transparent !important;
-    color: #007bff !important;
-    outline: none;
-    box-shadow: none;
-    border: 2px solid #007bff;
-}
-
+.circle-button:hover,
 .circle-button:focus,
-.circle-button:active,
-.circle-button:focus-visible {
-    background-color: transparent !important;
-    color: #007bff !important;
+.circle-button:active {
+    background-color: #0056b3 !important;
+    color: #ffffff !important;
     outline: none;
-    box-shadow: none;
-    border: 2px solid #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    border: 2px solid #0056b3;
 }
 
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
 
-    50% {
-        transform: scale(1.1);
-    }
+.card-header {
+    background-color: #007bff;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
 
-    100% {
-        transform: scale(1);
-    }
+.card-body {
+    padding: 2rem;
+}
+
+.alert-info {
+    background-color: #e9f5ff;
+    border-color: #b8e2ff;
+    color: #004085;
+}
+
+.display-4 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.lead {
+    font-size: 1.1rem;
+    color: #6c757d;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #e9f5ff;
+    color: #004085;
+}
+
+.custom-list {
+    margin-left: 20px;
+    padding-left: 0;
+}
+
+.custom-list li {
+    margin-bottom: 10px;
+    padding-left: 0;
+    text-align: left;
 }
 
 @media (max-width: 576px) {
@@ -77,46 +106,106 @@
     }
 
     .circle-button {
-        padding: 15px 30px;
-        font-size: 14px;
+        font-size: 16px;
         width: 120px;
         height: 120px;
     }
+
+    .card-header {
+        font-size: 20px;
+    }
+
+    .display-4 {
+        font-size: 2rem;
+    }
+
+    .lead {
+        font-size: 1rem;
+    }
 }
 
-html,
-body {
-    margin: 0;
-    padding: 0;
+.note-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
 }
 
-#root {
-    min-height: 100vh;
+.note-icon {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #e9f5ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 1rem;
+}
+
+.note-icon i {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+.note-content {
+    flex-grow: 1;
+}
+
+.note-content h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #007bff;
+}
+
+.note-content p {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .note-item {
+        margin-bottom: 2rem;
+    }
+}
+
+.start-button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.start-button {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
 }
 
-.main-content {
-    flex: 1;
-    padding-bottom: 2rem;
+.start-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
 }
 
-.footer {
-    padding: 1rem 0;
-    background: #f8f9fa;
+.start-button span {
+    display: block;
+    line-height: 1.2;
 }
 
-.custom-card-footer {
-    text-align: left;
-}
-
-.custom-list {
-    margin-left: 20px;
-    padding-left: 0;
-}
-
-.custom-list li {
-    margin-bottom: 5px;
-    padding-left: 0;
-    text-align: left;
+@media (max-width: 576px) {
+    .start-button {
+        width: 150px;
+        height: 150px;
+        font-size: 20px;
+    }
 }

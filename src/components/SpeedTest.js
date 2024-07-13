@@ -1,18 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  ProgressBar,
-  Row,
-  Col,
-  Button,
-  Container,
-  Card,
-  Alert,
-  Spinner,
-  Accordion,
-} from "react-bootstrap";
+import { Row, Col, Container, Card, Alert, Spinner } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
 import CountUp from "react-countup";
+import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./SpeedTestResults.css";
 
@@ -37,7 +28,6 @@ const SpeedTest = () => {
   const [delayMessage, setDelayMessage] = useState("");
   const [ipInfo, setIpInfo] = useState({});
   const [loading, setLoading] = useState(true);
-  const [renderTime, setRenderTime] = useState(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [downloadEnd, setDownloadEnd] = useState(0);
@@ -46,11 +36,7 @@ const SpeedTest = () => {
   const [uploadUnit, setUploadUnit] = useState("");
 
   useEffect(() => {
-    const startTime = performance.now();
-    fetchIpInfo().finally(() => {
-      const endTime = performance.now();
-      setRenderTime((endTime - startTime).toFixed(2));
-    });
+    fetchIpInfo();
   }, []);
 
   const fetchIpInfo = async () => {
@@ -94,8 +80,8 @@ const SpeedTest = () => {
 
   const testPing = async () => {
     const pingTimes = [];
-    const pingDuration = 5000; // 5000 milliseconds
-    const interval = 200; // Interval between pings
+    const pingDuration = 5000;
+    const interval = 200;
     const endTime = performance.now() + pingDuration;
 
     while (performance.now() < endTime) {
@@ -128,26 +114,26 @@ const SpeedTest = () => {
     setStatusMessage("Testing download speed...");
     await testDownloadSpeed();
     setDelayMessage("Please wait a moment before starting the upload test...");
-    await delay(2000); // 2-second delay between tests
+    await delay(2000);
     setDelayMessage("");
 
     setStatusMessage("Testing upload speed...");
     await testUploadSpeed();
 
-    setStatusMessage(""); // Clear the status message after tests are completed
+    setStatusMessage("");
     setDelayMessage("Please wait 10 seconds before taking another test.");
-    await delay(10000); // 10-second delay after tests are complete
+    await delay(10000);
 
     setIsTesting(false);
     setDelayMessage("");
-    setShowResults(true); // Show results after the test
+    setShowResults(true);
   };
 
   const testDownloadSpeed = async () => {
-    setProgress(0); // Ensure progress is reset before starting the test
+    setProgress(0);
 
     const startTime = new Date().getTime();
-    const fileSizeInBytes = 30000000; // 30MB file size
+    const fileSizeInBytes = 30000000;
 
     try {
       await axios.get(process.env.REACT_APP_TEST_FILE_URL, {
@@ -179,23 +165,20 @@ const SpeedTest = () => {
   };
 
   const testUploadSpeed = async () => {
-    setProgress(0); // Ensure progress is reset before starting the test
+    setProgress(0);
 
     const startTime = new Date().getTime();
-    const fileSizeInBytes = 30000000; // 30MB file size
+    const fileSizeInBytes = 30000000;
     const testFile = new Blob([new Uint8Array(fileSizeInBytes)], {
       type: "application/octet-stream",
     });
 
     try {
-      // Simulate initial connection setup delay
       await delay(100);
 
-      // Simulate a real network upload with varying delay
       for (let i = 0; i <= 100; i++) {
         setProgress(i);
-        // Simulate variable network delay
-        const variableDelay = Math.random() * 10 + 10; // Random delay
+        const variableDelay = Math.random() * 10 + 10;
         await new Promise((resolve) => setTimeout(resolve, variableDelay));
 
         const durationInSeconds = (new Date().getTime() - startTime) / 1000;
@@ -217,7 +200,10 @@ const SpeedTest = () => {
   };
 
   return (
-    <Container className="mt-4">
+    <Container
+      fluid
+      className="bg-light min-vh-100 d-flex align-items-center py-5"
+    >
       <Helmet>
         <title>Speed Test Application</title>
         <meta
@@ -225,117 +211,224 @@ const SpeedTest = () => {
           content="Test your download and upload speeds with our Speed Test Application."
         />
       </Helmet>
-      <Row className="justify-content-center">
-        <Col xs={12} md={8} lg={12}>
-          <Card>
-            <Card.Header as="h1" className="text-center">
+      <Container>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className="shadow-lg">
+            <Card.Header
+              as="h1"
+              className="text-center bg-primary text-white py-4"
+            >
               Internet Speed Test
             </Card.Header>
-            <Card.Body className="text-center">
+            <Card.Body className="text-center p-4">
               {loading ? (
                 <div className="text-center mt-4">
-                  <Spinner animation="grow" variant="primary" role="status">
+                  <Spinner animation="border" variant="primary" role="status">
                     <span className="visually-hidden">Loading...</span>
                   </Spinner>
                 </div>
               ) : (
                 <>
                   {ipInfo.ip && (
-                    <Alert variant="primary" className="mb-4">
-                      <strong>IP Address:</strong> {ipInfo.ip}
-                      <br />
-                      <strong>ISP:</strong> {ipInfo.org}
-                      <br />
-                      <strong>ASN:</strong> {ipInfo.asn}
-                    </Alert>
-                  )}
-                  <Button
-                    className="mb-3 circle-button mx-auto"
-                    onClick={testSpeed}
-                    disabled={isTesting}
-                  >
-                    Start!
-                  </Button>
-                  {isTesting && (
-                    <>
-                      <div className="progress-bar-container custom-progress-bar">
-                        <ProgressBar
-                          now={progress}
-                          label={`${progress}%`}
-                          style={{ height: "30px" }}
-                        />
-                      </div>
-                      <Row className="mt-4">
-                        <Col>
-                          <p className="bold-text">Ping</p>
-                          <CountUp
-                            end={ping ? parseFloat(ping) : 0}
-                            duration={5}
-                            suffix=" ms"
-                          />
+                    <Alert variant="info" className="mb-4">
+                      <Row className="g-2">
+                        <Col xs={12} md={4}>
+                          <strong>IP Address:</strong> {ipInfo.ip}
                         </Col>
-                        <Col>
-                          <p className="bold-text">Download</p>
-                          <CountUp
-                            end={downloadEnd}
-                            duration={10}
-                            suffix={` ${downloadUnit}`}
-                          />
+                        <Col xs={12} md={4}>
+                          <strong>ISP:</strong> {ipInfo.org}
                         </Col>
-                        <Col>
-                          <p className="bold-text">Upload</p>
-                          <CountUp
-                            end={uploadEnd}
-                            duration={10}
-                            suffix={` ${uploadUnit}`}
-                          />
+                        <Col xs={12} md={4}>
+                          <strong>ASN:</strong> {ipInfo.asn}
                         </Col>
                       </Row>
-                      <p className="text-center mt-4">{statusMessage}</p>
-                    </>
+                    </Alert>
+                  )}
+                  <motion.div
+                    className="start-button-container"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <motion.button
+                      className="start-button"
+                      onClick={testSpeed}
+                      disabled={isTesting}
+                      initial={{
+                        boxShadow: "0px 0px 0px rgba(0, 123, 255, 0)",
+                      }}
+                      animate={{
+                        boxShadow: isTesting
+                          ? "0px 0px 0px rgba(0, 123, 255, 0)"
+                          : "0px 0px 20px rgba(0, 123, 255, 0.5)",
+                      }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                      }}
+                    >
+                      {isTesting ? (
+                        <Spinner animation="border" variant="light" />
+                      ) : (
+                        <>
+                          <motion.span
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                          >
+                            Start
+                          </motion.span>
+                        </>
+                      )}
+                    </motion.button>
+                  </motion.div>
+                  {isTesting && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <div className="progress-bar-container custom-progress-bar mb-4">
+                        <div
+                          className="progress"
+                          style={{ height: "30px", backgroundColor: "#e9ecef" }}
+                        >
+                          <motion.div
+                            className="progress-bar bg-success"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.5 }}
+                          >
+                            {progress}%
+                          </motion.div>
+                        </div>
+                      </div>
+                      <Row className="g-4">
+                        <Col xs={12} md={4}>
+                          <Card className="shadow-sm h-100">
+                            <Card.Body>
+                              <h3 className="mb-3">Ping</h3>
+                              <CountUp
+                                end={ping ? parseFloat(ping) : 0}
+                                duration={5}
+                                suffix=" ms"
+                                className="display-4"
+                              />
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        <Col xs={12} md={4}>
+                          <Card className="shadow-sm h-100">
+                            <Card.Body>
+                              <h3 className="mb-3">Download</h3>
+                              <CountUp
+                                end={downloadEnd}
+                                duration={10}
+                                suffix={` ${downloadUnit}`}
+                                className="display-4"
+                              />
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        <Col xs={12} md={4}>
+                          <Card className="shadow-sm h-100">
+                            <Card.Body>
+                              <h3 className="mb-3">Upload</h3>
+                              <CountUp
+                                end={uploadEnd}
+                                duration={10}
+                                suffix={` ${uploadUnit}`}
+                                className="display-4"
+                              />
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      </Row>
+                      <p className="text-center mt-4 lead">{statusMessage}</p>
+                    </motion.div>
                   )}
                   {showResults && (
-                    <Row className="mt-4">
-                      <Col>
-                        <p className="bold-text">Ping</p>
-                        <p>{ping !== null ? `${ping} ms` : "N/A"}</p>
-                      </Col>
-                      <Col>
-                        <p className="bold-text">Download</p>
-                        <p>{downloadSpeed ? downloadSpeed : "N/A"}</p>
-                      </Col>
-                      <Col>
-                        <p className="bold-text">Upload</p>
-                        <p>{uploadSpeed ? uploadSpeed : "N/A"}</p>
-                      </Col>
-                    </Row>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Card className="shadow-sm mt-5">
+                        <Card.Body>
+                          <h3 className="mb-4">Final Results</h3>
+                          <Row className="g-4">
+                            <Col xs={12} md={4}>
+                              <p className="lead mb-1">Ping</p>
+                              <p className="display-6">
+                                {ping !== null ? `${ping} ms` : "N/A"}
+                              </p>
+                            </Col>
+                            <Col xs={12} md={4}>
+                              <p className="lead mb-1">Download</p>
+                              <p className="display-6">
+                                {downloadSpeed ? downloadSpeed : "N/A"}
+                              </p>
+                            </Col>
+                            <Col xs={12} md={4}>
+                              <p className="lead mb-1">Upload</p>
+                              <p className="display-6">
+                                {uploadSpeed ? uploadSpeed : "N/A"}
+                              </p>
+                            </Col>
+                          </Row>
+                        </Card.Body>
+                      </Card>
+                    </motion.div>
                   )}
-                  {delayMessage && <p>{delayMessage}</p>}
-                  <Accordion defaultActiveKey="1">
-                    <Accordion.Item eventKey="0">
-                      <Accordion.Header>Notes</Accordion.Header>
-                      <Accordion.Body>
-                        <ol className="custom-list">
-                          <li>
-                            There is a delay of 10 seconds before taking another
-                            test to ensure optimal results.
-                          </li>
-                          <li>
-                            This application is intended for testing purposes
-                            and not for commercial use, so no data logging is
-                            necessary.
-                          </li>
-                        </ol>
-                      </Accordion.Body>
-                    </Accordion.Item>
-                  </Accordion>
+                  {delayMessage && (
+                    <p className="mt-3 text-muted">{delayMessage}</p>
+                  )}
+                  <Card className="mt-5 shadow-sm">
+                    <Card.Body>
+                      <h3 className="mb-4 text-primary">Notes</h3>
+                      <Row className="g-4">
+                        <Col xs={12} md={6}>
+                          <div className="note-item">
+                            <div className="note-icon">
+                              <i className="fas fa-info-circle"></i>
+                            </div>
+                            <div className="note-content">
+                              <h4>Test Interval</h4>
+                              <p>
+                                There is a delay of 10 seconds before taking
+                                another test to ensure optimal results.
+                              </p>
+                            </div>
+                          </div>
+                        </Col>
+                        <Col xs={12} md={6}>
+                          <div className="note-item">
+                            <div className="note-icon">
+                              <i className="fas fa-info-circle"></i>
+                            </div>
+                            <div className="note-content">
+                              <h4>Usage</h4>
+                              <p>
+                                This application is intended for testing
+                                purposes and not for commercial use, so no data
+                                logging is necessary.
+                              </p>
+                            </div>
+                          </div>
+                        </Col>
+                      </Row>
+                    </Card.Body>
+                  </Card>
                 </>
               )}
             </Card.Body>
           </Card>
-          {/* <p className="text-center mt-2">{renderTime && `${renderTime}`}</p> */}
-        </Col>
-      </Row>
+        </motion.div>
+      </Container>
     </Container>
   );
 };
