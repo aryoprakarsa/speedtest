@@ -172,6 +172,7 @@ body {
 .start-button-container {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin-bottom: 2rem;
 }
 
@@ -214,42 +215,31 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 300px;
 }
 
 .progress-circle {
     width: 180px;
     height: 180px;
     border-radius: 50%;
+    border: 5px solid #007bff;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
 }
 
 .progress-circle-bar {
     width: 160px;
     height: 160px;
     border-radius: 50%;
-    border: 10px solid #007bff;
-    position: absolute;
+    border: 5px solid #007bff;
+    clip: rect(0, 160px, 160px, 80px);
 }
 
 .progress-circle-progress {
     width: 160px;
     height: 160px;
     border-radius: 50%;
-    border: 10px solid #007bff;
-    clip: rect(0, 160px, 160px, 80px);
-    position: absolute;
-    animation: progress-circle 5s linear infinite;
-}
-
-@keyframes progress-circle {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
+    border: 5px solid #007bff;
+    clip: rect(0, 80px, 160px, 0);
 }
