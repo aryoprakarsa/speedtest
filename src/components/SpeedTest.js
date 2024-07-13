@@ -122,6 +122,7 @@ const SpeedTest = () => {
     resetTestState();
     setIsTesting(true);
     setStatusMessage("Testing ping...");
+
     await testPing();
 
     setStatusMessage("Testing download speed...");
@@ -305,75 +306,56 @@ const SpeedTest = () => {
                     </motion.div>
                   )}
                   {isTesting && (
-                    <>
+                    <motion.div
+                      className="progress-circle-container"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
                       <motion.div
-                        className="progress-circle-container"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
+                        className="progress-circle"
+                        animate={{
+                          rotate: 360,
+                        }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 1,
+                          ease: "linear",
+                        }}
                       >
-                        <motion.div
-                          className="progress-circle"
-                          animate={{
-                            rotate: 360,
-                          }}
-                          transition={{
-                            repeat: Infinity,
-                            duration: 1,
-                            ease: "linear",
-                          }}
-                        >
-                          <div className="progress-circle-bar">
-                            <motion.div
-                              className="progress-circle-progress"
-                              initial={{ strokeDasharray: "0, 100" }}
-                              animate={{ strokeDasharray: `${progress}, 100` }}
-                              transition={{ duration: 0.5 }}
-                            />
-                          </div>
-                        </motion.div>
+                        <div className="progress-circle-bar">
+                          <motion.div
+                            className="progress-circle-progress"
+                            initial={{ strokeDasharray: "0, 100" }}
+                            animate={{ strokeDasharray: `${progress}, 100` }}
+                            transition={{ duration: 0.5 }}
+                          />
+                        </div>
                       </motion.div>
-                      <div className="mt-3">
-                        <Row className="g-4">
-                          <Col xs={12} md={4}>
-                            <p className="lead mb-1">Ping</p>
-                            <p className="display-6">
-                              <CountUp
-                                start={0}
-                                end={ping || 0}
-                                duration={5}
-                                suffix=" ms"
-                              />
-                            </p>
-                          </Col>
-                          <Col xs={12} md={4}>
-                            <p className="lead mb-1">Download</p>
-                            <p className="display-6">
-                              <CountUp
-                                start={0}
-                                end={downloadEnd}
-                                duration={5}
-                                suffix={` ${downloadUnit}`}
-                              />
-                            </p>
-                          </Col>
-                          <Col xs={12} md={4}>
-                            <p className="lead mb-1">Upload</p>
-                            <p className="display-6">
-                              <CountUp
-                                start={0}
-                                end={uploadEnd}
-                                duration={5}
-                                suffix={` ${uploadUnit}`}
-                              />
-                            </p>
-                          </Col>
-                        </Row>
-                      </div>
-                      <div className="mt-3">
-                        <p className="text-muted">{statusMessage}</p>
-                      </div>
-                    </>
+                    </motion.div>
+                  )}
+                  {isTesting && (
+                    <Row className="mt-4">
+                      <Col xs={12} md={4}>
+                        <p className="lead mb-1">Ping</p>
+                        <p className="display-6">
+                          <CountUp end={ping || 0} duration={5} /> ms
+                        </p>
+                      </Col>
+                      <Col xs={12} md={4}>
+                        <p className="lead mb-1">Download</p>
+                        <p className="display-6">
+                          <CountUp end={downloadEnd} duration={5} />{" "}
+                          {downloadUnit}
+                        </p>
+                      </Col>
+                      <Col xs={12} md={4}>
+                        <p className="lead mb-1">Upload</p>
+                        <p className="display-6">
+                          <CountUp end={uploadEnd} duration={5} /> {uploadUnit}
+                        </p>
+                      </Col>
+                    </Row>
                   )}
                   {showResults && (
                     <motion.div
