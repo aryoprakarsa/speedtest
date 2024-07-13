@@ -139,7 +139,6 @@ const SpeedTest = () => {
     await delay(10000);
 
     setIsTesting(false);
-
     setDelayMessage("");
     setShowResults(true);
   };
