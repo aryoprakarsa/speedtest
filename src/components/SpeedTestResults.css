@@ -169,9 +169,11 @@ body {
     }
 }
 
-.start-button-container {
+.start-button-container,
+.progress-circle-container {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin-bottom: 2rem;
 }
 
@@ -208,4 +210,30 @@ body {
         height: 150px;
         font-size: 20px;
     }
+}
+
+.progress-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 5px solid #007bff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress-circle-bar {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 5px solid #007bff;
+    clip: rect(0, 160px, 160px, 80px);
+}
+
+.progress-circle-progress {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 5px solid #007bff;
+    clip: rect(0, 80px, 160px, 0);
 }

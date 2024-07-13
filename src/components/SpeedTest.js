@@ -3,7 +3,7 @@ import axios from "axios";
 import { Row, Col, Container, Card, Alert, Spinner } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
 import CountUp from "react-countup";
-import { motion, useAnimation } from "framer-motion";
+import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./SpeedTestResults.css";
 
@@ -32,6 +32,7 @@ const SpeedTest = () => {
   const [ping, setPing] = useState(null);
   const [downloadSpeed, setDownloadSpeed] = useState(null);
   const [uploadSpeed, setUploadSpeed] = useState(null);
+  const [progress, setProgress] = useState(0);
   const [isTesting, setIsTesting] = useState(false);
   const [delayMessage, setDelayMessage] = useState("");
   const [ipInfo, setIpInfo] = useState({});
@@ -42,8 +43,6 @@ const SpeedTest = () => {
   const [uploadEnd, setUploadEnd] = useState(0);
   const [downloadUnit, setDownloadUnit] = useState("");
   const [uploadUnit, setUploadUnit] = useState("");
-
-  const animationControls = useAnimation();
 
   useEffect(() => {
     fetchIpInfo();
@@ -79,6 +78,7 @@ const SpeedTest = () => {
     setPing(null);
     setDownloadSpeed(null);
     setUploadSpeed(null);
+    setProgress(0);
     setDownloadEnd(0);
     setUploadEnd(0);
     setDownloadUnit("");
@@ -122,10 +122,6 @@ const SpeedTest = () => {
     resetTestState();
     setIsTesting(true);
     setStatusMessage("Testing ping...");
-    animationControls.start({
-      rotate: 360,
-      transition: { duration: 2, repeat: Infinity, ease: "linear" },
-    });
 
     await testPing();
 
@@ -143,12 +139,14 @@ const SpeedTest = () => {
     await delay(10000);
 
     setIsTesting(false);
-    animationControls.stop();
+
     setDelayMessage("");
     setShowResults(true);
   };
 
   const testDownloadSpeed = async () => {
+    setProgress(0);
+
     const startTime = new Date().getTime();
     const fileSizeInBytes = 30000000;
 
@@ -162,6 +160,7 @@ const SpeedTest = () => {
             Math.round((loaded * 100) / total),
             100
           );
+          setProgress(percentCompleted);
 
           const durationInSeconds = (new Date().getTime() - startTime) / 1000;
           const speedInBps = (loaded * 8) / durationInSeconds;
@@ -186,6 +185,8 @@ const SpeedTest = () => {
   };
 
   const testUploadSpeed = async () => {
+    setProgress(0);
+
     const startTime = new Date().getTime();
     const fileSizeInBytes = 30000000;
     const testFile = new Blob([new Uint8Array(fileSizeInBytes)], {
@@ -205,6 +206,7 @@ const SpeedTest = () => {
         const { speed, unit } = bytesToReadableSpeed(speedInBps);
         setUploadEnd(speed);
         setUploadUnit(unit);
+        setProgress(i);
       }
 
       const endTime = new Date().getTime();
@@ -271,101 +273,89 @@ const SpeedTest = () => {
                       </Row>
                     </Alert>
                   )}
-                  <motion.div
-                    className="start-button-container"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    animate={{
-                      rotate: isTesting ? 360 : 0,
-                      transition: {
-                        repeat: isTesting ? Infinity : 0,
-                        duration: 1,
-                        ease: "linear",
-                      },
-                    }}
-                  >
-                    <motion.button
-                      className="start-button"
-                      onClick={testSpeed}
-                      disabled={isTesting}
-                      initial={{
-                        boxShadow: "0px 0px 0px rgba(0, 123, 255, 0)",
-                      }}
-                      animate={{
-                        boxShadow: isTesting
-                          ? "0px 0px 0px rgba(0, 123, 255, 0)"
-                          : "0px 0px 20px rgba(0, 123, 255, 0.5)",
-                      }}
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                      }}
+                  {!isTesting && (
+                    <motion.div
+                      className="start-button-container"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      {isTesting ? (
-                        <Spinner animation="border" variant="light" />
-                      ) : (
-                        <>
-                          <motion.span
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                          >
-                            Start
-                          </motion.span>
-                        </>
-                      )}
-                    </motion.button>
-                  </motion.div>
+                      <motion.button
+                        className="start-button"
+                        onClick={testSpeed}
+                        disabled={isTesting}
+                        initial={{
+                          boxShadow: "0px 0px 0px rgba(0, 123, 255, 0)",
+                        }}
+                        animate={{
+                          boxShadow: "0px 0px 20px rgba(0, 123, 255, 0.5)",
+                        }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          repeatType: "reverse",
+                        }}
+                      >
+                        <motion.span
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          Start
+                        </motion.span>
+                      </motion.button>
+                    </motion.div>
+                  )}
                   {isTesting && (
                     <motion.div
+                      className="progress-circle-container"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.5 }}
                     >
-                      <Row className="g-4">
-                        <Col xs={12} md={4}>
-                          <Card className="shadow-sm h-100">
-                            <Card.Body>
-                              <h3 className="mb-3">Ping</h3>
-                              <CountUp
-                                end={ping ? parseFloat(ping) : 0}
-                                duration={5}
-                                suffix=" ms"
-                                className="display-4"
-                              />
-                            </Card.Body>
-                          </Card>
-                        </Col>
-                        <Col xs={12} md={4}>
-                          <Card className="shadow-sm h-100">
-                            <Card.Body>
-                              <h3 className="mb-3">Download</h3>
-                              <CountUp
-                                end={downloadEnd}
-                                duration={10}
-                                suffix={` ${downloadUnit}`}
-                                className="display-4"
-                              />
-                            </Card.Body>
-                          </Card>
-                        </Col>
-                        <Col xs={12} md={4}>
-                          <Card className="shadow-sm h-100">
-                            <Card.Body>
-                              <h3 className="mb-3">Upload</h3>
-                              <CountUp
-                                end={uploadEnd}
-                                duration={10}
-                                suffix={` ${uploadUnit}`}
-                                className="display-4"
-                              />
-                            </Card.Body>
-                          </Card>
-                        </Col>
-                      </Row>
-                      <p className="text-center mt-4 lead">{statusMessage}</p>
+                      <motion.div
+                        className="progress-circle"
+                        animate={{
+                          rotate: 360,
+                        }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 1,
+                          ease: "linear",
+                        }}
+                      >
+                        <div className="progress-circle-bar">
+                          <motion.div
+                            className="progress-circle-progress"
+                            initial={{ strokeDasharray: "0, 100" }}
+                            animate={{ strokeDasharray: `${progress}, 100` }}
+                            transition={{ duration: 0.5 }}
+                          />
+                        </div>
+                      </motion.div>
                     </motion.div>
+                  )}
+                  {isTesting && (
+                    <Row className="mt-4">
+                      <Col xs={12} md={4}>
+                        <p className="lead mb-1">Ping</p>
+                        <p className="display-6">
+                          <CountUp end={ping || 0} duration={5} /> ms
+                        </p>
+                      </Col>
+                      <Col xs={12} md={4}>
+                        <p className="lead mb-1">Download</p>
+                        <p className="display-6">
+                          <CountUp end={downloadEnd} duration={5} />{" "}
+                          {downloadUnit}
+                        </p>
+                      </Col>
+                      <Col xs={12} md={4}>
+                        <p className="lead mb-1">Upload</p>
+                        <p className="display-6">
+                          <CountUp end={uploadEnd} duration={5} /> {uploadUnit}
+                        </p>
+                      </Col>
+                    </Row>
                   )}
                   {showResults && (
                     <motion.div
