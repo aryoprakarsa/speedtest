@@ -3,7 +3,7 @@ import axios from "axios";
 import { Row, Col, Container, Card, Alert, Spinner } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
 import CountUp from "react-countup";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./SpeedTestResults.css";
 
@@ -32,7 +32,6 @@ const SpeedTest = () => {
   const [ping, setPing] = useState(null);
   const [downloadSpeed, setDownloadSpeed] = useState(null);
   const [uploadSpeed, setUploadSpeed] = useState(null);
-  const [progress, setProgress] = useState(0);
   const [isTesting, setIsTesting] = useState(false);
   const [delayMessage, setDelayMessage] = useState("");
   const [ipInfo, setIpInfo] = useState({});
@@ -43,6 +42,8 @@ const SpeedTest = () => {
   const [uploadEnd, setUploadEnd] = useState(0);
   const [downloadUnit, setDownloadUnit] = useState("");
   const [uploadUnit, setUploadUnit] = useState("");
+
+  const animationControls = useAnimation();
 
   useEffect(() => {
     fetchIpInfo();
@@ -78,7 +79,6 @@ const SpeedTest = () => {
     setPing(null);
     setDownloadSpeed(null);
     setUploadSpeed(null);
-    setProgress(0);
     setDownloadEnd(0);
     setUploadEnd(0);
     setDownloadUnit("");
@@ -122,6 +122,10 @@ const SpeedTest = () => {
     resetTestState();
     setIsTesting(true);
     setStatusMessage("Testing ping...");
+    animationControls.start({
+      rotate: 360,
+      transition: { duration: 2, repeat: Infinity, ease: "linear" },
+    });
 
     await testPing();
 
@@ -139,13 +143,12 @@ const SpeedTest = () => {
     await delay(10000);
 
     setIsTesting(false);
+    animationControls.stop();
     setDelayMessage("");
     setShowResults(true);
   };
 
   const testDownloadSpeed = async () => {
-    setProgress(0);
-
     const startTime = new Date().getTime();
     const fileSizeInBytes = 30000000;
 
@@ -159,7 +162,6 @@ const SpeedTest = () => {
             Math.round((loaded * 100) / total),
             100
           );
-          setProgress(percentCompleted);
 
           const durationInSeconds = (new Date().getTime() - startTime) / 1000;
           const speedInBps = (loaded * 8) / durationInSeconds;
@@ -184,8 +186,6 @@ const SpeedTest = () => {
   };
 
   const testUploadSpeed = async () => {
-    setProgress(0);
-
     const startTime = new Date().getTime();
     const fileSizeInBytes = 30000000;
     const testFile = new Blob([new Uint8Array(fileSizeInBytes)], {
@@ -196,7 +196,6 @@ const SpeedTest = () => {
       await delay(100);
 
       for (let i = 0; i <= 100; i++) {
-        setProgress(i);
         const variableDelay = Math.random() * 10 + 10;
         await new Promise((resolve) => setTimeout(resolve, variableDelay));
 
@@ -276,6 +275,14 @@ const SpeedTest = () => {
                     className="start-button-container"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    animate={{
+                      rotate: isTesting ? 360 : 0,
+                      transition: {
+                        repeat: isTesting ? Infinity : 0,
+                        duration: 1,
+                        ease: "linear",
+                      },
+                    }}
                   >
                     <motion.button
                       className="start-button"
@@ -316,21 +323,6 @@ const SpeedTest = () => {
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.5 }}
                     >
-                      <div className="progress-bar-container custom-progress-bar mb-4">
-                        <div
-                          className="progress"
-                          style={{ height: "30px", backgroundColor: "#e9ecef" }}
-                        >
-                          <motion.div
-                            className="progress-bar bg-success"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.5 }}
-                          >
-                            {progress}%
-                          </motion.div>
-                        </div>
-                      </div>
                       <Row className="g-4">
                         <Col xs={12} md={4}>
                           <Card className="shadow-sm h-100">
