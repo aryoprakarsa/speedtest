@@ -100,7 +100,7 @@ const SpeedTest = () => {
     while (performance.now() < endTime) {
       const startTime = performance.now();
       try {
-        await axios.get("https://www.speedtest.aryo.ai");
+        await axios.get("https://speedtest.aryo.ai");
         const pingTime = performance.now() - startTime;
         pingTimes.push(pingTime);
       } catch (error) {

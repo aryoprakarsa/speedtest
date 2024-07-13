@@ -2,7 +2,7 @@
   "name": "speedtest",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://www.speedtest.aryo.ai",
+  "homepage": "https://speedtest.aryo.ai",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
