@@ -333,7 +333,7 @@ const SpeedTest = () => {
               )}
             </Card.Body>
           </Card>
-          <p className="text-center mt-2">{renderTime && `${renderTime}`}</p>
+          {/* <p className="text-center mt-2">{renderTime && `${renderTime}`}</p> */}
         </Col>
       </Row>
     </Container>
