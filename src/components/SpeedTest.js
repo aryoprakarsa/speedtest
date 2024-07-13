@@ -19,6 +19,15 @@ const bytesToReadableSpeed = (bytes) => {
   }
 };
 
+const sendGAEvent = (eventCategory, eventAction, eventLabel) => {
+  if (window.gtag) {
+    window.gtag("event", eventAction, {
+      event_category: eventCategory,
+      event_label: eventLabel,
+    });
+  }
+};
+
 const SpeedTest = () => {
   const [ping, setPing] = useState(null);
   const [downloadSpeed, setDownloadSpeed] = useState(null);
@@ -99,6 +108,11 @@ const SpeedTest = () => {
     if (pingTimes.length > 0) {
       const averagePing = pingTimes.reduce((a, b) => a + b) / pingTimes.length;
       setPing(averagePing.toFixed(2));
+      sendGAEvent(
+        "Speed Test",
+        "Ping Test Completed",
+        `Ping: ${averagePing.toFixed(2)} ms`
+      );
     } else {
       setPing(null);
     }
@@ -159,6 +173,11 @@ const SpeedTest = () => {
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
       const { speed, unit } = bytesToReadableSpeed(speedInBps);
       setDownloadSpeed(`${speed} ${unit}`);
+      sendGAEvent(
+        "Speed Test",
+        "Download Test Completed",
+        `Download Speed: ${speed} ${unit}`
+      );
     } catch (error) {
       console.error("Error downloading the file:", error);
     }
@@ -194,6 +213,11 @@ const SpeedTest = () => {
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
       const { speed, unit } = bytesToReadableSpeed(speedInBps);
       setUploadSpeed(`${speed} ${unit}`);
+      sendGAEvent(
+        "Speed Test",
+        "Upload Test Completed",
+        `Upload Speed: ${speed} ${unit}`
+      );
     } catch (error) {
       console.error("Error uploading the file:", error);
     }
