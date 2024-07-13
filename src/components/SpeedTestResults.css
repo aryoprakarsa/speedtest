@@ -209,3 +209,35 @@ body {
         font-size: 20px;
     }
 }
+
+.progress-circle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 5px solid #007bff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress-circle-bar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 5px solid #007bff;
+    clip: rect(0, 80px, 80px, 40px);
+}
+
+.progress-circle-progress {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 5px solid #007bff;
+    clip: rect(0, 40px, 80px, 0);
+}
