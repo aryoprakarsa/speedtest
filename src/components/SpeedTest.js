@@ -9,6 +9,7 @@ import {
   Card,
   Alert,
   Spinner,
+  Accordion,
 } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
 import CountUp from "react-countup";
@@ -310,22 +311,27 @@ const SpeedTest = () => {
                     </Row>
                   )}
                   {delayMessage && <p>{delayMessage}</p>}
+                  <Accordion defaultActiveKey="1">
+                    <Accordion.Item eventKey="0">
+                      <Accordion.Header>Notes</Accordion.Header>
+                      <Accordion.Body>
+                        <ol className="custom-list">
+                          <li>
+                            There is a delay of 10 seconds before taking another
+                            test to ensure optimal results.
+                          </li>
+                          <li>
+                            This application is intended for testing purposes
+                            and not for commercial use, so no data logging is
+                            necessary.
+                          </li>
+                        </ol>
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
                 </>
               )}
             </Card.Body>
-            <Card.Footer className="custom-card-footer">
-              <strong>Notes:</strong>
-              <ol className="custom-list">
-                <li>
-                  There is a delay of 10 seconds before taking another test to
-                  ensure optimal results.
-                </li>
-                <li>
-                  This application is intended for testing purpose and not for
-                  commercial use, so no data logging is necessary.
-                </li>
-              </ol>
-            </Card.Footer>
           </Card>
           <p className="text-center mt-2">{renderTime && `${renderTime}`}</p>
         </Col>
