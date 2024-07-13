@@ -122,7 +122,6 @@ const SpeedTest = () => {
     resetTestState();
     setIsTesting(true);
     setStatusMessage("Testing ping...");
-
     await testPing();
 
     setStatusMessage("Testing download speed...");
@@ -334,28 +333,46 @@ const SpeedTest = () => {
                           </div>
                         </motion.div>
                       </motion.div>
-                      <Row className="my-4">
-                        <Col xs={12} md={4}>
-                          <p className="lead mb-1">Ping</p>
-                          <p className="display-6">
-                            <CountUp end={ping ? ping : 0} duration={1} /> ms
-                          </p>
-                        </Col>
-                        <Col xs={12} md={4}>
-                          <p className="lead mb-1">Download</p>
-                          <p className="display-6">
-                            <CountUp end={downloadEnd} duration={1} />{" "}
-                            {downloadUnit}
-                          </p>
-                        </Col>
-                        <Col xs={12} md={4}>
-                          <p className="lead mb-1">Upload</p>
-                          <p className="display-6">
-                            <CountUp end={uploadEnd} duration={1} />{" "}
-                            {uploadUnit}
-                          </p>
-                        </Col>
-                      </Row>
+                      <div className="mt-3">
+                        <Row className="g-4">
+                          <Col xs={12} md={4}>
+                            <p className="lead mb-1">Ping</p>
+                            <p className="display-6">
+                              <CountUp
+                                start={0}
+                                end={ping || 0}
+                                duration={5}
+                                suffix=" ms"
+                              />
+                            </p>
+                          </Col>
+                          <Col xs={12} md={4}>
+                            <p className="lead mb-1">Download</p>
+                            <p className="display-6">
+                              <CountUp
+                                start={0}
+                                end={downloadEnd}
+                                duration={5}
+                                suffix={` ${downloadUnit}`}
+                              />
+                            </p>
+                          </Col>
+                          <Col xs={12} md={4}>
+                            <p className="lead mb-1">Upload</p>
+                            <p className="display-6">
+                              <CountUp
+                                start={0}
+                                end={uploadEnd}
+                                duration={5}
+                                suffix={` ${uploadUnit}`}
+                              />
+                            </p>
+                          </Col>
+                        </Row>
+                      </div>
+                      <div className="mt-3">
+                        <p className="text-muted">{statusMessage}</p>
+                      </div>
                     </>
                   )}
                   {showResults && (
