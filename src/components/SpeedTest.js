@@ -149,7 +149,7 @@ const SpeedTest = () => {
     const fileSizeInBytes = 30000000; // 30MB file size
 
     try {
-      await axios.get("https://www.speedtest.aryo.ai/test-file/30mb.zip", {
+      await axios.get(process.env.REACT_APP_TEST_FILE_URL, {
         responseType: "arraybuffer",
         onDownloadProgress: (progressEvent) => {
           const loaded = progressEvent.loaded;
