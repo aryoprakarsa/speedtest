@@ -8,14 +8,15 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./SpeedTestResults.css";
 
 const bytesToReadableSpeed = (bytes) => {
-  if (bytes < 1024) {
-    return { speed: bytes.toFixed(2), unit: "Bps" };
-  } else if (bytes < 1024 * 1024) {
-    const speedInKbps = bytes / 1024;
-    return { speed: speedInKbps.toFixed(2), unit: "Kbps" };
+  const speedInBps = bytes * 8; // Convert bytes to bits per second
+  if (speedInBps < 1e3) {
+    return { speed: speedInBps.toFixed(2), unit: "bps" };
+  } else if (speedInBps < 1e6) {
+    return { speed: (speedInBps / 1e3).toFixed(2), unit: "Kbps" };
+  } else if (speedInBps < 1e9) {
+    return { speed: (speedInBps / 1e6).toFixed(2), unit: "Mbps" };
   } else {
-    const speedInMbps = bytes / (1024 * 1024);
-    return { speed: speedInMbps.toFixed(2), unit: "Mbps" };
+    return { speed: (speedInBps / 1e9).toFixed(2), unit: "Gbps" };
   }
 };
 
@@ -164,7 +165,7 @@ const SpeedTest = () => {
 
           const durationInSeconds = (new Date().getTime() - startTime) / 1000;
           const speedInBps = (loaded * 8) / durationInSeconds;
-          const { speed, unit } = bytesToReadableSpeed(speedInBps);
+          const { speed, unit } = bytesToReadableSpeed(loaded);
           setDownloadEnd(speed);
           setDownloadUnit(unit);
         },
@@ -172,7 +173,7 @@ const SpeedTest = () => {
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const { speed, unit } = bytesToReadableSpeed(speedInBps);
+      const { speed, unit } = bytesToReadableSpeed(fileSizeInBytes);
       setDownloadSpeed(`${speed} ${unit}`);
       sendGAEvent(
         "Speed Test",
@@ -203,7 +204,7 @@ const SpeedTest = () => {
         const durationInSeconds = (new Date().getTime() - startTime) / 1000;
         const speedInBps =
           (fileSizeInBytes * i * 8) / (100 * durationInSeconds);
-        const { speed, unit } = bytesToReadableSpeed(speedInBps);
+        const { speed, unit } = bytesToReadableSpeed(fileSizeInBytes * i);
         setUploadEnd(speed);
         setUploadUnit(unit);
         setProgress(i);
@@ -212,7 +213,7 @@ const SpeedTest = () => {
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const { speed, unit } = bytesToReadableSpeed(speedInBps);
+      const { speed, unit } = bytesToReadableSpeed(fileSizeInBytes);
       setUploadSpeed(`${speed} ${unit}`);
       sendGAEvent(
         "Speed Test",
@@ -306,56 +307,76 @@ const SpeedTest = () => {
                     </motion.div>
                   )}
                   {isTesting && (
-                    <motion.div
-                      className="progress-circle-container"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.5 }}
-                    >
+                    <>
                       <motion.div
-                        className="progress-circle"
-                        animate={{
-                          rotate: 360,
-                        }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 1,
-                          ease: "linear",
-                        }}
+                        className="progress-circle-container"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
                       >
-                        <div className="progress-circle-bar">
-                          <motion.div
-                            className="progress-circle-progress"
-                            initial={{ strokeDasharray: "0, 100" }}
-                            animate={{ strokeDasharray: `${progress}, 100` }}
-                            transition={{ duration: 0.5 }}
-                          />
-                        </div>
+                        <motion.div
+                          className="progress-circle"
+                          animate={{
+                            rotate: 360,
+                          }}
+                          transition={{
+                            repeat: Infinity,
+                            duration: 1,
+                            ease: "linear",
+                          }}
+                        >
+                          <div className="progress-circle-bar">
+                            <motion.div
+                              className="progress-circle-progress"
+                              initial={{ strokeDasharray: "0, 100" }}
+                              animate={{ strokeDasharray: `${progress}, 100` }}
+                              transition={{ duration: 0.5 }}
+                            />
+                          </div>
+                        </motion.div>
                       </motion.div>
-                    </motion.div>
-                  )}
-                  {isTesting && (
-                    <Row className="mt-4">
-                      <Col xs={12} md={4}>
-                        <p className="lead mb-1">Ping</p>
-                        <p className="display-6">
-                          <CountUp end={ping || 0} duration={5} /> ms
-                        </p>
-                      </Col>
-                      <Col xs={12} md={4}>
-                        <p className="lead mb-1">Download</p>
-                        <p className="display-6">
-                          <CountUp end={downloadEnd} duration={5} />{" "}
-                          {downloadUnit}
-                        </p>
-                      </Col>
-                      <Col xs={12} md={4}>
-                        <p className="lead mb-1">Upload</p>
-                        <p className="display-6">
-                          <CountUp end={uploadEnd} duration={5} /> {uploadUnit}
-                        </p>
-                      </Col>
-                    </Row>
+                      <Row className="g-4 mt-4">
+                        <Col xs={12} md={4}>
+                          <p className="lead mb-1">Ping</p>
+                          <p className="display-6">
+                            <CountUp
+                              start={0}
+                              end={ping !== null ? ping : 0}
+                              duration={1}
+                              separator=","
+                              decimals={2}
+                              suffix=" ms"
+                            />
+                          </p>
+                        </Col>
+                        <Col xs={12} md={4}>
+                          <p className="lead mb-1">Download</p>
+                          <p className="display-6">
+                            <CountUp
+                              start={0}
+                              end={downloadEnd !== null ? downloadEnd : 0}
+                              duration={1}
+                              separator=","
+                              decimals={2}
+                              suffix={` ${downloadUnit}`}
+                            />
+                          </p>
+                        </Col>
+                        <Col xs={12} md={4}>
+                          <p className="lead mb-1">Upload</p>
+                          <p className="display-6">
+                            <CountUp
+                              start={0}
+                              end={uploadEnd !== null ? uploadEnd : 0}
+                              duration={1}
+                              separator=","
+                              decimals={2}
+                              suffix={` ${uploadUnit}`}
+                            />
+                          </p>
+                        </Col>
+                      </Row>
+                    </>
                   )}
                   {showResults && (
                     <motion.div
