@@ -24,8 +24,8 @@ This project is a React-based Speed Test Application that allows users to test t
 1. Clone the repository:
 
 ```sh
-git clone https://github.com/yourusername/speed-test-app.git
-cd speed-test-app
+git clone https://github.com/aryoprakarsa/speedtest.git
+cd speedtest
 ```
 
 2. Install dependencies:
@@ -123,7 +123,7 @@ export default SpeedTest;
 
 ## License
 
-This project is licensed under the MIT License - see the [License](https://github.com/aryoprakarsa/speedtest/LICENSE.md) for details.
+This project is licensed under the MIT License - see the [License](https://github.com/aryoprakarsa/speedtest/blob/main/LICENSE.md) for details.
 
 ## Acknowledgments
 
