@@ -67,7 +67,7 @@ This component handles the main logic for the speed test application, including:
 This CSS file contains the styles for the Speed Test application, ensuring a clean and responsive design.
 
 `Event Logging`
-The application logs events to Google Analytics using the sendGAEvent function, which captures various metrics such as ISP, ASN, ping, download, and upload speeds.
+The application logs events to Google Analytics using the `sendGAEvent` function, which captures various metrics such as ISP, ASN, ping, download, and upload speeds.
 
 #### Example Usage
 
