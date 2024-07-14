@@ -8,15 +8,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./SpeedTestResults.css";
 
 const bytesToReadableSpeed = (bytes) => {
-  const speedInBps = bytes * 8; // Convert bytes to bits per second
-  if (speedInBps < 1e3) {
-    return { speed: speedInBps.toFixed(2), unit: "bps" };
-  } else if (speedInBps < 1e6) {
-    return { speed: (speedInBps / 1e3).toFixed(2), unit: "Kbps" };
-  } else if (speedInBps < 1e9) {
-    return { speed: (speedInBps / 1e6).toFixed(2), unit: "Mbps" };
+  if (bytes < 1024) {
+    return { speed: bytes.toFixed(2), unit: "Bps" };
+  } else if (bytes < 1024 * 1024) {
+    const speedInKbps = bytes / 1024;
+    return { speed: speedInKbps.toFixed(2), unit: "Kbps" };
   } else {
-    return { speed: (speedInBps / 1e9).toFixed(2), unit: "Gbps" };
+    const speedInMbps = bytes / (1024 * 1024);
+    return { speed: speedInMbps.toFixed(2), unit: "Mbps" };
   }
 };
 
@@ -44,6 +43,9 @@ const SpeedTest = () => {
   const [uploadEnd, setUploadEnd] = useState(0);
   const [downloadUnit, setDownloadUnit] = useState("");
   const [uploadUnit, setUploadUnit] = useState("");
+  const [finalPing, setFinalPing] = useState(null);
+  const [finalDownloadSpeed, setFinalDownloadSpeed] = useState(null);
+  const [finalUploadSpeed, setFinalUploadSpeed] = useState(null);
 
   useEffect(() => {
     fetchIpInfo();
@@ -109,6 +111,7 @@ const SpeedTest = () => {
     if (pingTimes.length > 0) {
       const averagePing = pingTimes.reduce((a, b) => a + b) / pingTimes.length;
       setPing(averagePing.toFixed(2));
+      setFinalPing(averagePing.toFixed(2));
       sendGAEvent(
         "Speed Test",
         "Ping Test Completed",
@@ -116,6 +119,7 @@ const SpeedTest = () => {
       );
     } else {
       setPing(null);
+      setFinalPing(null);
     }
   };
 
@@ -165,15 +169,16 @@ const SpeedTest = () => {
 
           const durationInSeconds = (new Date().getTime() - startTime) / 1000;
           const speedInBps = (loaded * 8) / durationInSeconds;
-          const { speed, unit } = bytesToReadableSpeed(loaded);
+          const { speed, unit } = bytesToReadableSpeed(speedInBps);
           setDownloadEnd(speed);
           setDownloadUnit(unit);
+          setFinalDownloadSpeed(`${speed} ${unit}`);
         },
       });
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const { speed, unit } = bytesToReadableSpeed(fileSizeInBytes);
+      const { speed, unit } = bytesToReadableSpeed(speedInBps);
       setDownloadSpeed(`${speed} ${unit}`);
       sendGAEvent(
         "Speed Test",
@@ -204,16 +209,17 @@ const SpeedTest = () => {
         const durationInSeconds = (new Date().getTime() - startTime) / 1000;
         const speedInBps =
           (fileSizeInBytes * i * 8) / (100 * durationInSeconds);
-        const { speed, unit } = bytesToReadableSpeed(fileSizeInBytes * i);
+        const { speed, unit } = bytesToReadableSpeed(speedInBps);
         setUploadEnd(speed);
         setUploadUnit(unit);
         setProgress(i);
+        setFinalUploadSpeed(`${speed} ${unit}`);
       }
 
       const endTime = new Date().getTime();
       const durationInSeconds = (endTime - startTime) / 1000;
       const speedInBps = (fileSizeInBytes * 8) / durationInSeconds;
-      const { speed, unit } = bytesToReadableSpeed(fileSizeInBytes);
+      const { speed, unit } = bytesToReadableSpeed(speedInBps);
       setUploadSpeed(`${speed} ${unit}`);
       sendGAEvent(
         "Speed Test",
@@ -335,44 +341,38 @@ const SpeedTest = () => {
                           </div>
                         </motion.div>
                       </motion.div>
-                      <Row className="g-4 mt-4">
+                      <Row className="mt-4">
                         <Col xs={12} md={4}>
                           <p className="lead mb-1">Ping</p>
                           <p className="display-6">
                             <CountUp
-                              start={0}
-                              end={ping !== null ? ping : 0}
+                              end={parseFloat(ping) || 0}
                               duration={1}
-                              separator=","
                               decimals={2}
-                              suffix=" ms"
-                            />
+                            />{" "}
+                            ms
                           </p>
                         </Col>
                         <Col xs={12} md={4}>
                           <p className="lead mb-1">Download</p>
                           <p className="display-6">
                             <CountUp
-                              start={0}
-                              end={downloadEnd !== null ? downloadEnd : 0}
+                              end={parseFloat(downloadEnd) || 0}
                               duration={1}
-                              separator=","
                               decimals={2}
-                              suffix={` ${downloadUnit}`}
-                            />
+                            />{" "}
+                            {downloadUnit}
                           </p>
                         </Col>
                         <Col xs={12} md={4}>
                           <p className="lead mb-1">Upload</p>
                           <p className="display-6">
                             <CountUp
-                              start={0}
-                              end={uploadEnd !== null ? uploadEnd : 0}
+                              end={parseFloat(uploadEnd) || 0}
                               duration={1}
-                              separator=","
                               decimals={2}
-                              suffix={` ${uploadUnit}`}
-                            />
+                            />{" "}
+                            {uploadUnit}
                           </p>
                         </Col>
                       </Row>
@@ -391,19 +391,21 @@ const SpeedTest = () => {
                             <Col xs={12} md={4}>
                               <p className="lead mb-1">Ping</p>
                               <p className="display-6">
-                                {ping !== null ? `${ping} ms` : "N/A"}
+                                {finalPing !== null ? `${finalPing} ms` : "N/A"}
                               </p>
                             </Col>
                             <Col xs={12} md={4}>
                               <p className="lead mb-1">Download</p>
                               <p className="display-6">
-                                {downloadSpeed ? downloadSpeed : "N/A"}
+                                {finalDownloadSpeed
+                                  ? finalDownloadSpeed
+                                  : "N/A"}
                               </p>
                             </Col>
                             <Col xs={12} md={4}>
                               <p className="lead mb-1">Upload</p>
                               <p className="display-6">
-                                {uploadSpeed ? uploadSpeed : "N/A"}
+                                {finalUploadSpeed ? finalUploadSpeed : "N/A"}
                               </p>
                             </Col>
                           </Row>
