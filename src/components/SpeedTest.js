@@ -18,11 +18,17 @@ const bytesToReadableSpeed = (bytes) => {
   }
 };
 
-const sendGAEvent = (eventCategory, eventAction, eventLabel) => {
+const sendGAEvent = (
+  eventCategory,
+  eventAction,
+  eventLabel,
+  additionalParams = {}
+) => {
   if (window.gtag) {
     window.gtag("event", eventAction, {
       event_category: eventCategory,
       event_label: eventLabel,
+      ...additionalParams,
     });
   }
 };
@@ -141,6 +147,14 @@ const SpeedTest = () => {
 
     setDelayMessage("");
     setShowResults(true);
+
+    sendGAEvent("Speed Test", "Speed Test Completed", "Final Results", {
+      ISP: ipInfo.org,
+      ASN: ipInfo.asn,
+      Ping: `${ping} ms`,
+      Download: `${downloadSpeed} ${downloadUnit}`,
+      Upload: `${uploadSpeed} ${uploadUnit}`,
+    });
   };
 
   const testDownloadSpeed = async () => {
@@ -432,7 +446,8 @@ const SpeedTest = () => {
                               <h4>Usage</h4>
                               <p>
                                 This application is intended for testing
-                                purposes and not for commercial use.
+                                purposes and not for commercial use, so no data
+                                logging is necessary.
                               </p>
                             </div>
                           </div>
