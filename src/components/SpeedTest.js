@@ -432,8 +432,7 @@ const SpeedTest = () => {
                               <h4>Usage</h4>
                               <p>
                                 This application is intended for testing
-                                purposes and not for commercial use, so no data
-                                logging is necessary.
+                                purposes and not for commercial use.
                               </p>
                             </div>
                           </div>
