@@ -123,7 +123,7 @@ export default SpeedTest;
 
 ## License
 
-This project is licensed under the MIT License - see the [License](https://github.com/aryoprakarsa/speedtest/blob/main/LICENSE.md) for details.
+This project is licensed under the MIT License - see the [License](https://github.com/aryoprakarsa/speedtest?tab=MIT-1-ov-file) for details.
 
 ## Acknowledgments
 
