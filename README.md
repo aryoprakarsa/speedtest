@@ -14,7 +14,7 @@ This project is a React-based Speed Test Application that allows users to test t
 
 - React
 - Axios
-- React-Bootstrap
+- React Bootstrap
 - Framer Motion
 - React Helmet
 - CSS
